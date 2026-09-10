@@ -61,13 +61,17 @@ ANCHORS = [
 ]
 
 # ② 受治理目录:(目录, glob, 最少文件数, 该目录是什么)
+#
+# ⚠ 阈值的取值原则:**按 `USAGE.md` §九「复制后建议删除的内容」精简之后仍须通过**。
+# 这一条是补修的 —— 第一版把阈值定在"当前实际数量"(如 skills 要求 12),结果
+# **照着 kit 自己的文档精简就会把门禁弄红**(skills 删掉 5 个可选目录后只剩 10)。
+# 一个会惩罚"按文档操作"的门禁,和 H1/H6 是同一类病。
+# 因此这里一律取「USAGE §九 允许删除之后」的下限(并留 1 个余量)。
 DIRECTORIES: list[tuple[str, str, int, str]] = [
-    ("docs", "*.md", 15, "设计文档"),
-    ("docs/adr", "*.md", 2, "ADR"),
-    ("docs/tutorials", "*.md", 3, "教程"),
-    ("harness/rules", "*.md", 15, "规则"),
+    ("docs", "*.md", 8, "设计文档"),
+    ("harness/rules", "*.md", 14, "规则"),
     ("harness/agents", "*.md", 12, "Agent 角色"),
-    ("harness/skills", "*/SKILL.md", 12, "Skill"),
+    ("harness/skills", "*/SKILL.md", 9, "Skill"),
     ("harness/templates", "*.md", 4, "模板"),
     ("harness/changes/_template", "*.md", 7, "变更七件套"),
     ("harness/pipeline", "*.md", 5, "流水线"),
@@ -75,12 +79,20 @@ DIRECTORIES: list[tuple[str, str, int, str]] = [
     ("harness/iteration", "*.md", 2, "迭代"),
     ("harness/wiki", "*.md", 5, "知识库"),
     ("harness/sources", "README.md", 1, "来源池入口"),
-    ("config", "*.yml", 3, "可观测性配置"),
-    (".github/workflows", "*.yml", 6, "CI / 自动化 workflow"),
+    (".github/workflows", "*.yml", 1, "CI 主 workflow"),
     (".github/ISSUE_TEMPLATE", "*.md", 2, "Issue 模板"),
     ("scripts", "*.py", 10, "检查脚本"),
     ("scripts", "*.sh", 3, "Shell 脚本"),
     ("tests", "*.py", 2, "测试"),
+]
+
+# ②b **可选**目录:USAGE §九 明确说可以整目录删除,所以"不存在"不算错;
+# 但**一旦存在就必须非空**(存在的空目录才是问题)。
+OPTIONAL_DIRECTORIES: list[tuple[str, str, str]] = [
+    ("docs/adr", "*.md", "ADR"),
+    ("docs/tutorials", "*.md", "教程"),
+    ("config", "*.yml", "可观测性配置"),
+    ("harness/pilot", "*.md", "空跑与试点"),
 ]
 
 # ③ 形状校验的根:这些目录/根下的 .md 必须非空且以 H1 开头。
@@ -112,7 +124,22 @@ def check_directories(root: Path) -> list[str]:
             errors.append(
                 f"{rel} 下匹配 {pattern!r} 的文件只有 {found} 个,少于要求的 {minimum} 个({what})"
             )
+
     return errors
+
+
+def check_optional_directories(root: Path) -> list[str]:
+    """可选目录:存在但为空 → **告警**(不判失败)。
+
+    判失败会把"照 USAGE §九 删掉内容、但目录还留着"这种正常操作变成红 ——
+    而这类目录本就是"可以整个删掉"的。空目录是个味道,提示即可。
+    """
+    warnings: list[str] = []
+    for rel, pattern, what in OPTIONAL_DIRECTORIES:
+        directory = root / rel
+        if directory.is_dir() and not list(directory.glob(pattern)):
+            warnings.append(f"{rel} 目录存在但为空({what};若不用请整目录删除)")
+    return warnings
 
 
 def check_shape(root: Path) -> list[str]:
@@ -230,7 +257,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  - {err}")
         return 1
 
-    warnings = check_placeholders(root)
+    warnings = check_placeholders(root) + check_optional_directories(root)
     for warning in warnings:
         print(f"  ⚠ {warning}")
 

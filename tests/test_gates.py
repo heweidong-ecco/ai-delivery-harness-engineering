@@ -172,6 +172,89 @@ def test_harness_docs_rejects_document_without_h1(tmp_path: Path) -> None:
     assert "没有 H1 标题" in result.stdout
 
 
+def test_gate_survives_the_slimming_documented_in_usage(tmp_path: Path) -> None:
+    """照 `USAGE.md` §九「复制后建议删除的内容」精简后,门禁**必须仍然通过**。
+
+    这条是补的 —— 第一版阈值直接取"当前实际数量"(如 skills 要求 ≥12),
+    结果**照 kit 自己的文档操作就会把门禁弄红**(5 个可选 skill 删掉后只剩 10)。
+    一个惩罚"按文档操作"的门禁与 H1/H6 是同一类病:约束本身站不住。
+    """
+    target = tmp_path / "repo"
+    shutil.copytree(
+        ROOT,
+        target,
+        ignore=shutil.ignore_patterns(
+            ".git",
+            ".claude",
+            "original_document",
+            "__pycache__",
+            ".venv",
+            ".mypy_cache",
+            ".ruff_cache",
+            ".pytest_cache",
+            ".import_linter_cache",
+            "*.egg-info",
+            ".coverage*",
+            "pytest-report.json",
+            "htmlcov",
+        ),
+    )
+    # USAGE §九 列出的可删除项(逐条照抄)
+    deletable = [
+        "harness/rules/performance-standard.md",
+        "harness/rules/concurrency-standard.md",
+        "harness/rules/cache-standard.md",
+        "harness/rules/timezone-standard.md",
+        "harness/rules/i18n-standard.md",
+        "harness/skills/performance",
+        "harness/skills/refactor",
+        "harness/skills/migration",
+        "harness/skills/api-versioning",
+        "harness/skills/db-migration",
+        "harness/agents/refactor-agent.md",
+        "harness/agents/dependency-agent.md",
+        "harness/agents/doc-agent.md",
+        ".github/workflows/auto-label.yml",
+        ".github/workflows/stale.yml",
+        ".github/workflows/release.yml",
+        ".github/workflows/dependency-update.yml",
+        ".github/workflows/security-scan.yml",
+        "docs/adr",
+        "docs/tutorials",
+        "docs/compliance.md",
+        "docs/data-governance.md",
+        "docs/threat-model.md",
+        "docs/capacity-planning.md",
+        "docs/integrations.md",
+        "docs/anti-patterns.md",
+        "docs/best-practices.md",
+        "docs/roadmap.md",
+        "config/grafana",
+        "config/prometheus.yml",
+        "config/alert-rules.yml",
+        "config/logging.yml",
+        "scripts/collect_metrics.py",
+        "scripts/audit_log.py",
+        "scripts/state_tracker.py",
+        "scripts/check_dependencies.py",
+    ]
+    for rel in deletable:
+        path = target / rel
+        if path.is_dir():
+            shutil.rmtree(path)
+        elif path.is_file():
+            path.unlink()
+
+    result = subprocess.run(
+        [sys.executable, str(SCRIPTS / "check_harness_docs.py"), "--root", str(target)],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, (
+        "照 USAGE §九 精简后门禁变红了 —— 门禁在惩罚'按文档操作':\n" + result.stdout
+    )
+
+
 FENCE = "`" * 3
 
 
