@@ -712,3 +712,372 @@ make gate
 3. 你项目的目录结构；
 4. 你项目的 DDL；
 5. 你项目的 CI 配置。
+
+
+# 脚手架-单薄空仓库。**没有具体项目依附**。下面把话说透。
+
+---
+
+## 1. 单薄的真正原因
+
+### 原因 A：你在用“空仓库”装“活规则”
+
+Harness 文件的厚度不来自写作技巧，而来自**项目里真实踩过的坑**。
+
+一条厚规则长这样：
+
+```text
+价格字段必须用 Long，单位分。
+原因：2024-03 订单模块用 Double 计算优惠，
+      0.1 + 0.2 = 0.30000000000000004，
+      对账差异 37 万，事故编号 INC-2024-0312。
+反例：OrderService.calcDiscount()
+正例：PriceUtil.add()
+检查：scripts/check_python_rules.py 第 42 行
+测试：tests/pricing/test_discount.py::test_float_precision
+```
+
+我给的是：
+
+```text
+价格字段必须用 Long，单位分。
+```
+
+差别不是写法，是**背后有没有历史**。
+
+### 原因 B：我不知道你的项目长什么样
+
+我给的 `project-structure.md` 里写的是通用五层。  
+但你项目可能是：
+
+- FastAPI + SQLAlchemy + Celery + Redis；
+- 或者 Django + DRF + PostgreSQL；
+- 或者 gRPC + protobuf + 自研框架。
+
+这三者的分层规则、超时规则、降级规则完全不同。  
+我没有这些信息，只能写通用骨架。
+
+### 原因 C：单薄是“可运行骨架”，不是“完整体系”
+
+我给的东西能跑：
+
+- CI 能过；
+- 门禁能拦；
+- 脚本能检查。
+
+但它是**脚手架**，不是**装修好的房子**。  
+真正的 Harness 是随着项目实战一砖一瓦补出来的。
+
+---
+
+## 2. 单薄 vs 厚实：具体对比
+
+### 规则文件
+
+**我给的（单薄）**：
+
+```markdown
+# Python 编码规范
+
+- 所有函数必须写类型注解。
+- 金额字段必须使用 Decimal 或整数分，禁止 float。
+- 外部 HTTP 调用必须设置 timeout。
+```
+
+**真实项目里应该长这样（厚实）**：
+
+```markdown
+# Python 编码规范
+
+## 1. 类型注解
+
+### 强制
+- 所有 public 函数必须写完整类型注解。
+- 禁止 `Any`，除非在 adapter 边界且写明原因。
+
+### 反例
+```python
+def get_user(id):  # 缺类型
+    ...
+```
+
+### 正例
+```python
+def get_user(user_id: int) -> User | None:
+    ...
+```
+
+### 检查
+- mypy strict
+- CI 阶段：type
+
+### 历史
+- 2024-05 因缺少类型注解，线上传入 str 导致 500，
+  事故 INC-2024-0518。
+
+## 2. 金额
+
+### 强制
+- 金额统一用 `int` 表示“分”。
+- 禁止 `float`、`Decimal` 混用。
+- 对外接口金额字段命名必须以 `_cents` 结尾。
+
+### 反例
+```python
+price: float = 9.9
+```
+
+### 正例
+```python
+price_cents: int = 990
+```
+
+### 检查
+- scripts/check_python_rules.py
+- 规则 ID: PRICE-001
+
+### 测试
+- tests/pricing/test_amount.py
+- 必须覆盖：0、负数、最大值、精度边界
+
+### 历史
+- 2024-03 对账差异 37 万，INC-2024-0312。
+- 2024-07 国际站汇率换算精度丢失，INC-2024-0709。
+
+### 技能文件
+
+**我给的**：
+
+```markdown
+# Coding Skill
+## 八份分层规范
+1. Controller 规范
+2. Service 规范
+...
+```
+
+**厚实的**：
+
+```markdown
+# Service 层编码规范
+
+## 职责
+- 编排 domain 和 repository。
+- 事务边界在这里。
+- 不写 SQL，不写 HTTP。
+
+## 模板
+```python
+class OrderService:
+    def __init__(
+        self,
+        order_repo: OrderRepository,
+        payment_adapter: PaymentAdapter,
+    ) -> None:
+        self._order_repo = order_repo
+        self._payment_adapter = payment_adapter
+
+    def create_order(self, cmd: CreateOrderCommand) -> Order:
+        order = Order.create(cmd)
+        self._order_repo.save(order)
+        try:
+            self._payment_adapter.charge(
+                order.id,
+                order.amount_cents,
+                timeout=3,
+            )
+        except PaymentTimeout:
+            order.mark_pending()
+            self._order_repo.save(order)
+            raise
+        return order
+```
+
+## 禁止
+- 禁止在 service 里 `import requests`。
+- 禁止在 service 里写 `session.query`。
+- 禁止吞异常。
+
+## 检查
+- ruff 规则：TID252
+- 自定义：scripts/check_layers.py
+
+## 历史
+- 2024-04 service 直接调 HTTP 未设超时，
+  支付回调堆积，INC-2024-0421。
+
+---
+
+## 3. 厚实内容从哪里来
+
+| 来源             | 产出          | 举例                      |
+| ---------------- | ------------- | ------------------------- |
+| 历史故障复盘     | 硬约束        | 价格用 float 导致对账差异 |
+| Code Review 意见 | 编码规范      | 禁止在 api 层写业务逻辑   |
+| 架构评审         | 分层规则      | domain 不依赖 ORM         |
+| 线上监控告警     | 超时/降级规则 | 外部调用必须 3s 超时      |
+| 安全审计         | 安全规则      | 禁止日志打印身份证        |
+| 性能优化         | 性能规则      | 禁止 N+1 查询             |
+| 新人踩坑         | 入门规则      | 配置必须走 settings       |
+| 国际化事故       | 同步规则      | 主链路改动必须检查 i18n   |
+| 数据一致性事故   | 事务规则      | 跨库操作必须走 saga       |
+| 发布事故         | 部署规则      | 部署参数必须人工确认      |
+
+**没有这些来源，规则就是空的。**  
+单薄——没有故障库、Review 记录、架构文档。
+
+---
+
+## 4. 怎么把它变厚
+
+### 方法一：从历史故障反推
+
+拉出过去 12 个月的事故报告：
+
+```bash
+# 每条事故问三个问题
+1. 这条事故能不能用一条规则拦住？
+2. 这条规则能不能程序化验证？
+3. 这条规则应该放在哪个文件？
+```
+
+每一条事故 → 一条规则 → 一个检查脚本 → 一个测试用例。
+
+### 方法二：从 Code Review 反推
+
+拉出过去 3 个月的 PR Review 意见：
+
+```bash
+# 每条 Review 意见问
+1. 这是不是重复出现的？
+2. 重复 3 次以上 → 写成规则
+3. 能自动化 → 写成 lint 规则
+```
+
+### 方法三：从架构文档反推
+
+项目已有的：
+
+- 架构图 → 补全 `project-structure.md`
+- 接口文档 → 补全 `business-flows.md`
+- DDL → 补全 `data-model.md`
+- 配置中心 → 补全 `deploy-validation.md`
+
+### 方法四：从真实需求反推
+
+每做一个需求，问：
+
+```text
+这次踩了什么坑？
+→ 写进 harness/iteration/patch-log.md
+→ 转成一条规则
+→ 加一个检查
+→ 加一个测试
+```
+
+---
+
+## 5. 厚实的标准
+
+一个文件算“厚实”，要满足：
+
+| 维度     | 单薄   | 厚实                                    |
+| -------- | ------ | --------------------------------------- |
+| 规则条数 | 3-5 条 | 30-100 条                               |
+| 每条规则 | 一句话 | 原因 + 反例 + 正例 + 检查 + 测试 + 历史 |
+| 代码示例 | 无     | 每层至少 1 个完整模板                   |
+| 检查脚本 | 通用   | 按规则 ID 可追溯                        |
+| 测试用例 | smoke  | 按规则覆盖                              |
+| 历史关联 | 无     | 每条对应事故/Review                     |
+| 版本     | 无     | 每条规则有变更记录                      |
+| 责任人   | 无     | 每条规则有 owner                        |
+
+---
+
+## 6. 该做什么
+
+现在仓库里的东西是**骨架**。下一步不是继续加骨架，而是**填肉**。
+
+具体动作：
+
+### 动作 1：建“规则来源池”
+
+```bash
+mkdir -p harness/sources
+cat > harness/sources/incidents.md <<'EOF'
+# 事故来源池
+
+| 事故编号 | 日期 | 模块 | 现象 | 根因 | 可转规则 | 状态 |
+| -------- | ---- | ---- | ---- | ---- | -------- | ---- |
+EOF
+
+cat > harness/sources/review-comments.md <<'EOF'
+# Review 意见来源池
+
+| 日期 | PR  | 评论 | 重复次数 | 可转规则 | 状态 |
+| ---- | --- | ---- | -------- | -------- | ---- |
+EOF
+```
+
+然后把你项目过去的事故和 Review 填进去。
+
+### 动作 2：每条规则加“六件套”
+
+```markdown
+## 规则 ID: PRICE-001
+
+### 规则
+金额必须用 int 表示分。
+
+### 原因
+2024-03 对账差异 37 万。
+
+### 反例
+python
+price: float = 9.9
+
+### 正例
+python
+price_cents: int = 990
+
+### 检查
+scripts/check_python_rules.py
+
+### 测试
+tests/pricing/test_amount.py
+```
+
+### 动作 3：从你项目拉真实数据
+
+以下任意信息，把对应文件写厚：
+
+| 信息                  | 能写厚的文件              |
+| --------------------- | ------------------------- |
+| 你的分层架构          | project-structure.md      |
+| 你用的 HTTP/RPC 框架  | python-coding-standard.md |
+| 你的配置中心          | deploy-validation.md      |
+| 你过去的 3 个事故     | coding-standard.md        |
+| 你最近的 10 条 Review | coding-standard.md        |
+| 你的 DDL              | data-model.md             |
+| 你的接口文档          | business-flows.md         |
+| 你的 CI 配置          | dev-process.md            |
+
+---
+
+## 7. 总结
+
+**只有骨架，没有具体项目血肉。**  
+Harness 的厚度 = 你项目历史踩坑的总和。  
+你每填一条真实事故、一条真实 Review、一个真实架构约束，它就厚一分。
+
+---
+
+下一步以下任意一项，把它写厚：
+
+1. 你项目的分层架构和包结构；
+2. 你用的 FastAPI/Django/Flask 及 HTTP 客户端；
+3. 你过去 3 个线上事故；
+4. 你最近 10 条 Code Review 意见；
+5. 你的 `pyproject.toml` 或 `requirements.txt`。
+
+把对应的 Harness 文件从“单薄骨架”写成“可执行的企业级规则”。

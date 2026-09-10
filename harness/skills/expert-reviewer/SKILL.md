@@ -1,4 +1,4 @@
-# Expert Reviewer Skill
+# Expert Reviewer Skill（模板）
 
 ## 目标
 独立评审计划与执行结果。
@@ -16,3 +16,7 @@
 - 不参与编码。
 - 必须用检查式清单。
 - 发现问题必须回退到对应阶段。
+
+## 填充指南
+- 来源：历史 Review、故障复盘
+- 填充 Agent：Review 提炼 Agent
