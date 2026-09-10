@@ -1,12 +1,35 @@
+```python
+"""检查 Harness 文档完整性。"""
+
+from pathlib import Path
+
 REQUIRED = [
-    # 根
-    "README.md", "LICENSE", "CONTRIBUTING.md", "CHANGELOG.md", "SECURITY.md",
-    "Dockerfile", "docker-compose.yml", "pyproject.toml", "Makefile",
-    "requirements.txt", "requirements-dev.txt",
-    ".pre-commit-config.yaml", ".gitignore", ".gitattributes", ".editorconfig",
-    ".env.example", ".env.ci", ".env.test", ".gitmessage",
-    ".yamllint.yml", ".markdownlint.yml", ".coveragerc", ".bandit",
-    ".importlinter", ".dockerignore",
+    # 根目录
+    "README.md",
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "Dockerfile",
+    "docker-compose.yml",
+    "pyproject.toml",
+    "Makefile",
+    "requirements.txt",
+    "requirements-dev.txt",
+    ".pre-commit-config.yaml",
+    ".gitignore",
+    ".gitattributes",
+    ".editorconfig",
+    ".env.example",
+    ".env.ci",
+    ".env.test",
+    ".gitmessage",
+    ".yamllint.yml",
+    ".markdownlint.yml",
+    ".coveragerc",
+    ".bandit",
+    ".importlinter",
+    ".dockerignore",
 
     # .github
     ".github/workflows/harness-ci.yml",
@@ -28,13 +51,26 @@ REQUIRED = [
     "config/grafana/dashboard.json",
 
     # docs
-    "docs/quickstart.md", "docs/fill-guide.md", "docs/faq.md",
-    "docs/architecture.md", "docs/naming-conventions.md", "docs/versioning.md",
-    "docs/anti-patterns.md", "docs/best-practices.md", "docs/glossary.md",
-    "docs/roadmap.md", "docs/integrations.md", "docs/compliance.md",
-    "docs/data-governance.md", "docs/threat-model.md", "docs/capacity-planning.md",
-    "docs/adr/README.md", "docs/adr/template.md",
-    "docs/tutorials/first-rule.md", "docs/tutorials/first-agent.md", "docs/tutorials/first-requirement.md",
+    "docs/quickstart.md",
+    "docs/fill-guide.md",
+    "docs/faq.md",
+    "docs/architecture.md",
+    "docs/naming-conventions.md",
+    "docs/versioning.md",
+    "docs/anti-patterns.md",
+    "docs/best-practices.md",
+    "docs/glossary.md",
+    "docs/roadmap.md",
+    "docs/integrations.md",
+    "docs/compliance.md",
+    "docs/data-governance.md",
+    "docs/threat-model.md",
+    "docs/capacity-planning.md",
+    "docs/adr/README.md",
+    "docs/adr/template.md",
+    "docs/tutorials/first-rule.md",
+    "docs/tutorials/first-agent.md",
+    "docs/tutorials/first-requirement.md",
 
     # harness/rules
     "harness/rules/project-structure.md",
@@ -81,14 +117,20 @@ REQUIRED = [
     "harness/skills/db-migration/SKILL.md",
 
     # harness/wiki
-    "harness/wiki/README.md", "harness/wiki/glossary.md",
-    "harness/wiki/data-model.md", "harness/wiki/business-flows.md",
-    "harness/wiki/monitoring.md", "harness/wiki/rollback-playbook.md",
-    "harness/wiki/onboarding.md", "harness/wiki/faq.md",
+    "harness/wiki/README.md",
+    "harness/wiki/glossary.md",
+    "harness/wiki/data-model.md",
+    "harness/wiki/business-flows.md",
+    "harness/wiki/monitoring.md",
+    "harness/wiki/rollback-playbook.md",
+    "harness/wiki/onboarding.md",
+    "harness/wiki/faq.md",
 
     # harness/templates
-    "harness/templates/incident.md", "harness/templates/postmortem.md",
-    "harness/templates/design-doc.md", "harness/templates/rfc.md",
+    "harness/templates/incident.md",
+    "harness/templates/postmortem.md",
+    "harness/templates/design-doc.md",
+    "harness/templates/rfc.md",
     "harness/templates/runbook.md",
 
     # harness/changes
@@ -115,19 +157,23 @@ REQUIRED = [
     "harness/pipeline/rollback-process.md",
 
     # harness/metrics
-    "harness/metrics/metrics.md", "harness/metrics/dashboard.md",
-    "harness/metrics/collection.md", "harness/metrics/badges.md",
+    "harness/metrics/metrics.md",
+    "harness/metrics/dashboard.md",
+    "harness/metrics/collection.md",
+    "harness/metrics/badges.md",
     "harness/metrics/sla.md",
 
     # harness/iteration
-    "harness/iteration/README.md", "harness/iteration/patch-log.md",
+    "harness/iteration/README.md",
+    "harness/iteration/patch-log.md",
     "harness/iteration/retrospective.md",
 
     # harness/sources
     "harness/sources/README.md",
 
     # harness/agents
-    "harness/agents/README.md", "harness/agents/orchestrator.md",
+    "harness/agents/README.md",
+    "harness/agents/orchestrator.md",
     "harness/agents/fill-harness.md",
     "harness/agents/architecture-agent.md",
     "harness/agents/incident-agent.md",
@@ -180,6 +226,49 @@ REQUIRED = [
     "scripts/dev-setup.sh",
 
     # tests
-    "tests/README.md", "tests/conftest.py",
-    "tests/test_smoke.py", "tests/test_scripts.py",
+    "tests/README.md",
+    "tests/conftest.py",
+    "tests/test_smoke.py",
+    "tests/test_scripts.py",
 ]
+
+PLACEHOLDER_SKIP = {
+    "harness/rules/_template.md",
+    "harness/skills/_template/SKILL.md",
+    "harness/changes/_template/README.md",
+}
+
+
+def check_missing() -> list[str]:
+    return [p for p in REQUIRED if not Path(p).exists()]
+
+
+def check_placeholders() -> list[str]:
+    """核心文件不应有未填占位符（模板除外）。"""
+    errors: list[str] = []
+    for path_str in REQUIRED:
+        if path_str in PLACEHOLDER_SKIP:
+            continue
+        path = Path(path_str)
+        if not path.exists() or path.suffix != ".md":
+            continue
+        content = path.read_text(encoding="utf-8")
+        if "<待填>" in content and "填充指南" not in content:
+            errors.append(f"{path_str}: 有未填占位符但无填充指南")
+    return errors
+
+
+def main() -> None:
+    missing = check_missing()
+    if missing:
+        raise SystemExit("Missing harness docs:\n" + "\n".join(missing))
+
+    placeholders = check_placeholders()
+    if placeholders:
+        print("Placeholder warnings:\n" + "\n".join(placeholders))
+
+    print(f"Harness docs check passed ({len(REQUIRED)} files)")
+
+
+if __name__ == "__main__":
+    main()

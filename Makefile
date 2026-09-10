@@ -1,4 +1,4 @@
-.PHONY: help install lint format type test layers secrets schema complexity i18n deps metrics audit markdownlint yamllint gate commit-msg hooks clean check all
+.PHONY: help install lint format type test layers secrets schema complexity i18n deps metrics audit markdownlint yamllint gate check all commit-msg hooks clean
 
 help:
 	@echo "Available targets:"
@@ -14,14 +14,15 @@ help:
 	@echo "  i18n         国际化检查"
 	@echo "  deps         依赖审计"
 	@echo "  metrics      度量采集"
+	@echo "  audit        审计记录"
+	@echo "  markdownlint Markdown 检查"
+	@echo "  yamllint     YAML 检查"
 	@echo "  gate         完整门禁"
 	@echo "  check        gate 别名"
 	@echo "  all          安装 + gate"
+	@echo "  commit-msg   提交信息检查"
+	@echo "  hooks        安装钩子"
 	@echo "  clean        清理"
-
-check: gate
-
-all: install gate
 
 install:
 	pip install -e ".[dev]"
@@ -74,6 +75,10 @@ gate: lint format type test layers secrets schema complexity i18n
 	python scripts/check_python_rules.py src
 	python scripts/check_harness_docs.py
 
+check: gate
+
+all: install gate
+
 commit-msg:
 	python scripts/check_commit_msg.py .git/COMMIT_EDITMSG
 
@@ -82,3 +87,4 @@ hooks:
 
 clean:
 	rm -rf .pytest_cache .mypy_cache .ruff_cache htmlcov .coverage pytest-report.json
+	rm -rf harness/metrics/data/*.json
