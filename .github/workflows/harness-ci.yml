@@ -1,0 +1,22 @@
+name: Harness CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  gate-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check required harness files
+        run: |
+          test -f harness/rules/project-structure.md
+          test -f harness/rules/dev-process.md
+          test -f harness/rules/coding-standard.md
+          test -f harness/agent/application-owner.md
+      - name: Check change template
+        run: |
+          test -f harness/changes/_template/requirement-analysis.md
+          test -f harness/changes/_template/ci-result.md
