@@ -1,9 +1,10 @@
 > **项目蓝图**：见 [BluePrint.md](./BluePrint.md)
 > **使用指南**：见 [USAGE.md](./USAGE.md)
 > **填充工作流**：见 [FillWorkflow.md](./FillWorkflow.md)
-> **状态**：v0.1.0-skeleton **已于 2026-09-11 解冻**，用于修正外审缺陷 H1–H14（见 `docs/freeze.md`）。
+> **状态**：v0.1.0-skeleton，**2026-09-11 解冻后暂不重新冻结**（见 `docs/freeze.md`）。
+> 外审缺陷 H1–H14 与两轮全仓清理（X1–X18）均已完成，`make gate` 全绿。
 > 骨架 100% 完成，填充 0%，试点 0%。
-> 下一步：修完 H1–H14 → 由业务方决定是否重新冻结 → 引入项目 → 跑 6 个核心 Agent → 空跑 REQ-0000。
+> 下一步：引入项目 → 跑 6 个核心 Agent → 空跑 REQ-0000。
 >
 # AI Delivery Harness Engineering
 
