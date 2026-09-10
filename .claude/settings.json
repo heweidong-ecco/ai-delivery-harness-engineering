@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "AUDIT_REMINDER=1 .claude/hooks/audit-reminder.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
