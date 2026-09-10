@@ -2,6 +2,8 @@ import ast
 import sys
 from pathlib import Path
 
+
+
 PRICE_HINTS = ("price", "amount", "money", "金额", "价格")
 HTTP_METHODS = {"get", "post", "put", "delete", "patch", "request"}
 HTTP_MODULES = {"requests", "httpx"}

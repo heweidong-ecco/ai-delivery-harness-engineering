@@ -1,4 +1,27 @@
-.PHONY: install lint format type test layers secrets schema complexity i18n deps metrics audit markdownlint yamllint gate commit-msg hooks clean
+.PHONY: help install lint format type test layers secrets schema complexity i18n deps metrics audit markdownlint yamllint gate commit-msg hooks clean check all
+
+help:
+	@echo "Available targets:"
+	@echo "  install      安装依赖"
+	@echo "  lint         Ruff lint"
+	@echo "  format       Ruff format 检查"
+	@echo "  type         Mypy 类型检查"
+	@echo "  test         Pytest"
+	@echo "  layers       分层检查"
+	@echo "  secrets      密钥扫描"
+	@echo "  schema       Schema 校验"
+	@echo "  complexity   复杂度检查"
+	@echo "  i18n         国际化检查"
+	@echo "  deps         依赖审计"
+	@echo "  metrics      度量采集"
+	@echo "  gate         完整门禁"
+	@echo "  check        gate 别名"
+	@echo "  all          安装 + gate"
+	@echo "  clean        清理"
+
+check: gate
+
+all: install gate
 
 install:
 	pip install -e ".[dev]"
