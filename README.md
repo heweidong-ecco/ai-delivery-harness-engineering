@@ -1,3 +1,6 @@
+> **项目蓝图**：见 [BluePrint.md](./BluePrint.md)
+> **使用指南**：见 [USAGE.md](./USAGE.md)
+> **填充工作流**：见 [FillWorkflow.md](./FillWorkflow.md)
 > **状态**：v0.1.0-skeleton 已冻结。
 > 骨架 100% 完成，填充 0%，试点 0%。
 > 下一步：引入项目 → 跑 6 个核心 Agent → 空跑 REQ-0000。
