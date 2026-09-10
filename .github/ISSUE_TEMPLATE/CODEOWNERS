@@ -1,0 +1,10 @@
+# 默认
+* @your-team
+
+# Harness
+/harness/rules/ @rule-owner
+/harness/skills/ @skill-owner
+/harness/agent/ @agent-owner
+/harness/sources/ @source-owner
+/scripts/ @ci-owner
+/.github/ @ci-owner

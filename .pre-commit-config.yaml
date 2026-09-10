@@ -11,3 +11,11 @@ repos:
     hooks:
       - id: mypy
         args: [src]
+
+  - repo: local
+    hooks:
+      - id: check-commit-msg
+        name: check commit message
+        entry: python scripts/check_commit_msg.py
+        language: system
+        stages: [commit-msg]

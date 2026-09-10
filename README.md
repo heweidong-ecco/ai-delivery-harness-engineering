@@ -2,8 +2,7 @@
 
 AI 代码上线 Harness 体系：规则、技能、知识库、变更管理、Agent 角色、十阶段流水线与质量门禁，让 AI 生成代码质量可控、可发现、可修复。
 
-不依赖具体项目的 Harness 骨架。  
-用于后续按项目填充规则、技能、知识库和 Agent。
+不依赖具体项目的 Harness 骨架。  用于后续按项目填充规则、技能、知识库和 Agent。
 
 ## 核心目标
 
@@ -117,7 +116,58 @@ ai-delivery-harness-engineering/
 └── tests/
     └── test_smoke.py
 
+## 快速开始
+
+```bash
+git clone <repo>
+cd ai-delivery-harness-engineering
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+pre-commit install
+make gate
+```
+## 目录导航
+
+| 目录               | 用途         |
+| ------------------ | ------------ |
+| harness/rules/     | 稳定约束     |
+| harness/skills/    | 阶段 SOP     |
+| harness/wiki/      | 业务上下文   |
+| harness/changes/   | 变更留痕     |
+| harness/agent/     | Agent 角色   |
+| harness/pipeline/  | 十阶段流水线 |
+| harness/metrics/   | 度量         |
+| harness/iteration/ | Patch 记录   |
+| harness/sources/   | 来源池       |
+| harness/agents/    | 填充 Agent   |
+| scripts/           | 检查脚本     |
+| docs/              | 文档         |
+
+## 状态
+
+- ☑ 目录结构
+- ☑ 通用规则模板
+- ☑ 通用技能模板
+- ☑ 通用 Agent 定义
+- ☑ 填充 Agent
+- ☑ CI 与门禁骨架
+- ☑ 文档
+- □ 项目规则填充
+- □ 项目知识库填充
 
 ## 填充方式
 
+见 `docs/fill-guide.md`。
+
 见 `harness/agents/fill-harness.md`。
+
+## 贡献
+
+见 `CONTRIBUTING.md`。
+
+## 许可证
+
+MIT，见 `LICENSE`。
+
+---
