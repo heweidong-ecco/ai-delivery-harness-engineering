@@ -120,6 +120,14 @@
 | **X8** | **`logging-standard.md` 被 6 处引用但不存在**(骨架承诺 20 份规则、实交 19 份);`python-coding-standard.md` 是**两份文档拼接**(正文 + 重复的"（模板）"副本) | CHANGELOG 等 | ✅ 已修 |
 | **X9** | **README 冻结状态过期**:banner 仍写"已冻结",而 `docs/freeze.md` 已记录 2026-09-11 解冻;文档尾部还残留**元文本**(教人复制本 README、含 `gh pr create`) | `README.md`、`FillWorkflow.md` | ✅ 已修 |
 | **X10** | **`harness/agents/1.md`** 是 0 字节孤儿文件(全仓无引用) | — | ✅ 已删(经业主确认) |
+| **X11** | **`.vscode/` 被 `.gitignore` 忽略,README 目录结构与 USAGE §八 却承诺它随仓库交付** → 新克隆拿不到(与 `logging-standard.md` 同类:承诺了却未交付) | `.gitignore:37`、`README.md:324`、`USAGE.md:379` | ✅ 已修(`.vscode/*` + 白名单两份配置) |
+| **X12** | **人工确认记录写在哪,两份文档互相矛盾** | `human-checkpoints.md:15`(写 `changes/REQ-XXXX/`)vs `checkpoints/README.md:9`(`harness/checkpoints/<REQ>-HC<N>.md`) | ✅ 已修(定后者为权威源) |
+| **X13** | **`Dockerfile:21` 的 `‖ true`** —— 而 `.dockerignore` 排除了 `.git`,`pre-commit install` 在该镜像里**必然失败**,这句等于永久掩盖;防腐测试扫描面也漏了 Dockerfile | `Dockerfile:21` | ✅ 已删该行 + 扫描面扩到 Dockerfile/docker-compose/所有 .sh |
+| **X14** | **`stages.md` 的「每阶段三要素」是与上文重复的空表**(10×3 全 `<待填>`),而上文总览表三列早已填好 | `stages.md:18-31` | ✅ 已删重复表,改为说明"三要素即上表对应列" |
+| **X15** | **三套状态词表互不相通、也无关系说明**(需求级 7 个中文状态 / 阶段级 `in_progress`·`passed` / 十阶段名) | `changes/README.md`、`state/README.md` | ✅ 已补"粒度不同 + 派生关系"对照表 |
+| **X16** | **`tests/conftest.py` 15 个 fixture 有 13 个无人使用**,而 `tests/README.md` 还把其中几个当"可用 fixture"介绍 | `tests/conftest.py` | ✅ 已删死 fixture,并改写 tests/README |
+| **X17** | **`BluePrint.md` §2 目录蓝图与已交付骨架不一致**(蓝图 3 份规则/9 Skill/只有 `agent/`;实交 20 份/14 SKILL/`agents/`+多个目录),却无一句对齐说明 | `BluePrint.md` §2 | ✅ 已加"蓝图≠实现"对照说明(不重写蓝图) |
+| **X18** | **markdownlint / yamllint 配了却从未运行**(既不在 gate 也不在 CI)→ 首跑积压 **309 条**;另有 3 个文件是"正文 + （模板）副本"拼接(`project-structure.md`、`python-layers.md`、`coding/SKILL.md`,与 X8 同型)、`metrics.md` 表格被未转义的 `\|` 撑破、CHANGELOG/ freeze 版本日期为占位符、全仓 81 个文件缺行尾换行 | `Makefile`、`.github/workflows/`、上述文件 | ✅ 已修;并把两者**挂进 gate 与 CI** |
 
 **建议处理顺序**(工单 §7):`H1→H3`(先把坏门禁救活,并保证**再坏会被发现**)→ `H2` → `H5→H4`(增量阶段门 + 真状态机)→ 其余 → `H8`。
 

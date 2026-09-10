@@ -91,7 +91,11 @@ markdownlint:
 yamllint:
 	pre-commit run yamllint --all-files
 
-gate: lint format type test coverage layers secrets schema complexity i18n
+# `markdownlint` / `yamllint` 加进 gate:
+#   反外审追加 —— 这两个 target 一直存在,但**既不在 gate 也不在 CI**,
+#   于是从未运行过:实测 markdownlint 首跑就积了 **309 条**问题。
+#   与 H5「没挂进链路 = 形同不存在」同型。
+gate: lint format type test coverage layers secrets schema complexity i18n markdownlint yamllint
 	python scripts/check_pytest_report.py pytest-report.json
 	python scripts/check_python_rules.py src
 	python scripts/check_harness_docs.py

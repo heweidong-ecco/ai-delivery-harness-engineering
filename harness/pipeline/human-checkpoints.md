@@ -12,7 +12,8 @@
 
 ## 确认记录
 
-每次确认写入 `harness/changes/REQ-XXXX/` 对应文件。
+每次确认写入 `harness/checkpoints/<REQ>-HC<N>.md`(格式见 `harness/checkpoints/README.md`)。
+该路径是**权威源**:`harness/state/stages.json` 里阶段 10「用户确认」的产出物即按此定义。
 
 ## 硬性约束
 

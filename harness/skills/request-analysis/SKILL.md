@@ -1,16 +1,20 @@
 # Request Analysis Skill
 
 ## 目标
+
 把需求转化为可执行的分析文档。
 
 ## 触发条件
+
 新需求进入。
 
 ## 输入
+
 - 需求描述
 - Wiki 业务上下文
 
 ## 步骤
+
 1. 理解背景。
 2. 明确目标。
 3. 划范围与非目标。
@@ -21,9 +25,11 @@
 8. 写回退方案。
 
 ## 输出
+
 harness/changes/REQ-XXXX/requirement-analysis.md
 
 ## 质量门禁
+
 - 背景清晰
 - 目标可量化
 - 范围明确
@@ -33,5 +39,6 @@ harness/changes/REQ-XXXX/requirement-analysis.md
 - 风险与回退已写
 
 ## 失败回退
+
 - 边界不清：请求人工确认
 - 验收不可验证：重写

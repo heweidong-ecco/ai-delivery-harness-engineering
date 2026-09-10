@@ -17,6 +17,7 @@ bash scripts/dev-setup.sh
 ```
 
 ## 第一个任务
+
 1.从 harness/changes/ 选一个 REQ。
 
 2.阅读 requirement-analysis.md。
@@ -28,9 +29,11 @@ bash scripts/dev-setup.sh
 5.提交 PR。
 
 ## 常见问题
+
 见 harness/wiki/faq.md。
 
 ## 填充指南
+
 来源：团队经验
 
 填充 Agent：架构解析 Agent

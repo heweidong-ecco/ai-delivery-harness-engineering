@@ -34,7 +34,11 @@ harness/metrics/data/*.json
 
 # ide
 .idea/
-.vscode/
+# `.vscode/` 里这两份是 **kit 自带的配置**(README 目录结构与 USAGE §八 都承诺随仓库交付),
+# 所以要跟踪;其余本地编辑器状态照旧忽略。
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 
 # logs
 *.log

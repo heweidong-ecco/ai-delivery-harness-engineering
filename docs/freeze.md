@@ -6,7 +6,7 @@ v0.1.0-skeleton
 
 ## 冻结日期
 
-2026-XX-XX
+2026-09-10(依据:冻结说明提交 dc886ff,日期 2026-09-10)
 
 ## 冻结范围
 
@@ -69,6 +69,7 @@ v0.1.0-skeleton
 「每次填充必须走 PR → 以『最小留痕』替代」是同一取向的延续。
 
 **留痕替代方案**:
+
 1. 提交信息按 `scripts/check_commit_msg.py` 的规范(`<type>: <subject>`),
    并在正文写明**变更依据**(外审工单编号 H1–H14、patch-log 条目等);
 2. 每条修正登记在 `harness/iteration/patch-log.md` §五「已 Patch 清单」;
@@ -85,4 +86,3 @@ v0.1.0-skeleton
 
 **恢复条件**:重新冻结、或对外发布范本之前,应恢复「走 PR」并要求至少一人审核
 (`CONTRIBUTING.md` §PR 规范)。
-

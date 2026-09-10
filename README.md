@@ -12,7 +12,7 @@
 [![CI](https://github.com/<org>/<repo>/actions/workflows/harness-ci.yml/badge.svg)](https://github.com/<org>/<repo>/actions/workflows/harness-ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
-[![Status](https://img.shields.io/badge/status-skeleton--unfrozen-orange)]()
+![Status](https://img.shields.io/badge/status-skeleton--unfrozen-orange)
 
 ---
 
@@ -1504,4 +1504,3 @@ MIT，见 [LICENSE](./LICENSE)。
 > **Harness 的价值不在于让 Agent 变得更聪明，而在于让 Agent 的错误变得可控、可发现、可修复。**
 >
 > **这和传统软件质量保障思路一脉相承：我们不指望程序员写出零缺陷代码，而是通过 Code Review、Unit Testing、CI/CD 来确保缺陷被层层拦截。Harness 做的事情本质上完全一样，只不过拦截对象从程序员变成了 Agent。**
-

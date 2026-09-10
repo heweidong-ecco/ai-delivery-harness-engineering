@@ -48,21 +48,20 @@ python scripts/check_harness_docs.py
 ## 硬性约束
 
 - 金额禁止 float。
-    
+
 - 外部调用必须有 timeout。
-    
+
 - 测试数必须大于 0。
-    
+
 - 覆盖率不低于 80%。
-    
+
 - CI 必须满足 Status=SUCCESS、TotalTest>0、Passed=Total。
-    
+
 - 禁止裸 except。
-    
+
 - 禁止 print。
-    
+
 - 配置禁止硬编码。
-    
 
 ## 回退路径
 
@@ -75,6 +74,5 @@ python scripts/check_harness_docs.py
 | Pytest 失败       | 单测编写或编码实现 |
 | Python rules 违规 | 编码实现           |
 | Harness docs 缺失 | 文档管理           |
-
 
 ---

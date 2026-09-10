@@ -14,6 +14,9 @@
 
 ### Added
 
+> **2026-09-11 第二轮清理**:第一轮修完 H1–H14 后复查全仓,又发现并修掉 8 条
+> 同类缺陷(X11–X18,见 `harness/iteration/patch-log.md` §四 4.1)。
+
 - `harness/rules/logging-standard.md` —— 补上骨架承诺却未交付的那一份规则文件(骨架承诺 20 份、实交 19 份)
 - `scripts/stage_gate.py` —— **真状态机**:进入阶段前校验前置阶段 passed **且产出物现在依然存在**;`resume` 从第一个断点续跑
 - `harness/state/stages.json` —— 十阶段门配置(阶段 → 产出物),是 `stage_gate.py` 与 `check-gates.sh` 的**单一来源**
@@ -35,7 +38,19 @@
 - 5 个 workflow 从 `harness/workflows/` 移入 `.github/workflows/`;`CODEOWNERS`、`dependabot.yml` 移入 `.github/`(H7)
 - `config/` 四份配置**显式标注为「示例、未接线」**,并写明要生效还缺什么(H8)
 - `ruff` 的 `T20` 按目录放行(`scripts/*`、`tests/*` 是 CLI 与测试);启用 **subprocess 覆盖率**(原先 741 条语句实测 0.00% —— 门禁测不到任何东西)
-- 文档层:修正 `docs/fill-workflow.md` 死引用、`harness/agent/`(单数)残留 8 处、README 目录树与实际不符(把 `agent/` 与 `agents/` 写成了两个目录)、去掉两份文档尾部的元文本、README 冻结状态改为与 `docs/freeze.md` 一致
+- 文档层:修正 `docs/fill-workflow.md` 死引用、`harness/agent/`(单数)残留 8 处、
+  README 目录树与实际不符(把 `agent/` 与 `agents/` 写成了两个目录)、
+  去掉两份文档尾部的元文本、README 冻结状态改为与 `docs/freeze.md` 一致
+- markdownlint 首次真正跑通(此前**从未运行过**),309 条问题已清零;`make gate` 与
+  CI 自此**包含** `markdownlint` / `yamllint`(此前两个 target 存在却不在任何链路里)
+- `.vscode/` 改为**随仓库交付**(原先被 `.gitignore` 忽略,而 README/USAGE 都承诺交付它)
+- `stages.md` 删掉与上文重复且永远空着的「每阶段三要素」表;`changes/README.md` 与
+  `state/README.md` 补上两套状态词表的粒度对照(需求级 / 阶段级)
+- `tests/conftest.py` 删掉 13 个无人使用的 fixture(其中 `harness_root` /
+  `sample_req_dir` 等还被 `tests/README.md` 当作"可用 fixture"介绍)
+- `BluePrint.md` §2 加"蓝图≠已交付骨架"的对照说明(蓝图是原始设计,骨架更大)
+- 人工确认记录的路径统一为 `harness/checkpoints/<REQ>-HC<N>.md`
+  (原先 `human-checkpoints.md` 与 `checkpoints/README.md` 说法矛盾)
 
 ### Fixed
 
@@ -57,11 +72,11 @@
 
 ---
 
-## [0.1.0-skeleton] - 2024-XX-XX
+## [0.1.0-skeleton] - 2026-09-10
 
 ### Added
 
-**核心骨架**
+#### 核心骨架
 
 - 完整目录结构
 - 规则体系（20 份）
@@ -129,7 +144,7 @@
 - 模板（5 个）
 - 状态、审计、检查点目录
 
-**文档**
+#### 文档
 
 - README 完整版
 - CONTRIBUTING
@@ -139,13 +154,13 @@
 - ADR（README + template）
 - 教程（3 份）
 
-**CI**
+#### CI
 
 - harness-ci.yml
 - commit-message 检查
 - security-scan.yml
 
-**工程配置**
+#### 工程配置
 
 - Dockerfile
 - docker-compose.yml
@@ -172,7 +187,7 @@
 
 ---
 
-## [0.0.1] - 2024-XX-XX
+## [0.0.1] - 2026-09-10
 
 ### Added
 

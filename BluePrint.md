@@ -64,6 +64,19 @@ L7 持续迭代层
 
 ## 2. 目录蓝图
 
+> ⚠ **本节是「原始设计」,不是「已交付的骨架」** —— 两者有意不同:
+> 落地时为了把"软约束转硬"补齐了更多零件,骨架比蓝图**大**。
+>
+> | | 本节蓝图(原始设计) | 已交付骨架(权威目录) |
+> | --- | --- | --- |
+> | 规则 | 3 份(工程结构 / 开发流程 / 编码规范) | **20 份**(含安全、异常、日志、可观测、性能、数据库、API、并发、缓存、幂等、时区、依赖、测试、国际化等) |
+> | Skill | 9 个 | **14 个 `SKILL.md`**(+ 扩展目录) |
+> | Agent 角色 | `agent/application-owner.md` | `harness/agents/`(**同一目录**内含 `application-owner*.md` 与 14 个填充 Agent) |
+> | 另有 | — | `templates/`、`metrics/`、`iteration/`、`pilot/`、`state/`、`audit/`、`checkpoints/`、`sources/` |
+>
+> **查实际目录结构请看 `README.md` §六「目录结构」**(它由 `scripts/check_harness_docs.py` 守着),
+> 本节的蓝图矩阵(§3–§15)仍然是设计意图的权威来源。
+
 ```text
 project-root/
 ├── harness/
@@ -301,4 +314,3 @@ Harness 的价值不在于让 Agent 变得更聪明，而在于让 Agent 的错�
 | `USAGE.md`        | 怎么用这个 kit | 使用者、复制者       |
 | `FillWorkflow.md` | 怎么填充内容   | 填充者、Agent 操作者 |
 | `BluePrint.md`    | 蓝图           | 核心内容总设计文档   |
-

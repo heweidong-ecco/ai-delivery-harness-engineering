@@ -44,15 +44,14 @@ python scripts/check_pytest_report.py pytest-report.json
 ## 结果
 
 - TotalTest：
-    
+
 - Passed：
-    
+
 - Failed：
-    
+
 - Errors：
-    
+
 - 覆盖率：
-    
 
 ## 未覆盖项
 

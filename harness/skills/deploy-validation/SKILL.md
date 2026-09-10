@@ -1,15 +1,19 @@
 # Deploy Validation Skill
 
 ## 目标
+
 验证部署后关键路径。
 
 ## 触发条件
+
 CI 通过。
 
 ## 输入
+
 部署脚本、环境参数
 
 ## 步骤
+
 1. 人工确认环境参数。
 2. 执行部署。
 3. 验证主链路。
@@ -20,9 +24,11 @@ CI 通过。
 8. 准备回滚。
 
 ## 输出
+
 harness/changes/REQ-XXXX/deploy-validation.md
 
 ## 质量门禁
+
 - 参数人工确认
 - 主链路通过
 - 国际化链路通过
@@ -32,5 +38,6 @@ harness/changes/REQ-XXXX/deploy-validation.md
 - 回滚就绪
 
 ## 失败回退
+
 - 参数错误：回退参数确认
 - 关键路径不通：回退编码实现

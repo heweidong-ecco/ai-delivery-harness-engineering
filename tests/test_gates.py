@@ -658,22 +658,40 @@ def test_pre_commit_runs_pytest() -> None:
     assert "pytest" in config, "pre-commit 里没有 pytest —— 提交环节没有测试门"
 
 
-def test_makefile_has_no_soft_fail() -> None:
-    """H12:`|| true` 让"检查"永不失败 = 等于没有检查。"""
-    offenders = [
-        f"Makefile:{number}" for number, code in code_lines(ROOT / "Makefile") if "|| true" in code
-    ]
-    assert not offenders, f"Makefile 里仍有软失败: {offenders}"
+# 软失败扫描面:原先只扫 Makefile 与 CI workflow,**漏掉了 Dockerfile** ——
+# 于是 `Dockerfile` 里那句 `pre-commit install --install-hooks || true` 一直没被抓到。
+# 教训:防腐测试本身也有覆盖面,覆盖面之外等于没有门禁。
+SOFT_FAIL_SURFACE = [
+    ROOT / "Makefile",
+    ROOT / "Dockerfile",
+    ROOT / "docker-compose.yml",
+    *sorted((ROOT / ".github" / "workflows").glob("*.yml")),
+    *sorted((ROOT / "scripts").glob("*.sh")),
+]
 
 
-def test_ci_has_no_soft_fail() -> None:
-    """H11:CI 里的 `|| true` 同样是软失败。"""
+def test_no_soft_fail_anywhere() -> None:
+    """H11/H12:`|| true` 让"检查"永不失败 = 等于没有检查。
+
+    扫描面覆盖 Makefile / CI / **Dockerfile** / docker-compose / 所有 .sh。
+    """
     offenders: list[str] = []
-    for path in sorted((ROOT / ".github" / "workflows").glob("*.yml")):
+    for path in SOFT_FAIL_SURFACE:
+        if not path.is_file():
+            continue
         offenders += [
-            f"{path.name}:{number}" for number, code in code_lines(path) if "|| true" in code
+            f"{path.relative_to(ROOT)}:{number}"
+            for number, code in code_lines(path)
+            if "|| true" in code
         ]
-    assert not offenders, f"CI 里仍有软失败: {offenders}"
+    assert not offenders, f"仍有软失败(`|| true`): {offenders}"
+
+
+def test_soft_fail_scan_covers_dockerfile() -> None:
+    """反向验证:扫描面必须真的包含 Dockerfile(漏掉它正是上一版的 bug)。"""
+    names = {p.name for p in SOFT_FAIL_SURFACE}
+    assert "Dockerfile" in names
+    assert "docker-compose.yml" in names
 
 
 def test_import_linter_is_declared_and_invoked() -> None:

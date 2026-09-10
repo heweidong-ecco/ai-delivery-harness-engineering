@@ -30,6 +30,14 @@ jobs:
       - name: Mypy
         run: mypy src
 
+      # 反外审追加:这两个 linter 一直配着,却从未被任何链路调用 ——
+      # 实测 markdownlint 首跑积了 309 条问题(与 H5「没挂进链路 = 形同不存在」同型)。
+      - name: Markdownlint
+        run: pre-commit run markdownlint --all-files
+
+      - name: Yamllint
+        run: pre-commit run yamllint --all-files
+
       - name: Pytest
         run: pytest --json-report --json-report-file=pytest-report.json
 

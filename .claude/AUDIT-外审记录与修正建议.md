@@ -83,7 +83,8 @@
 ### H7 设计稿放错目录 = **永不生效**
 
 - **证据**:`harness/workflows/` 下 5 个 yml(`auto-label` / `stale` / `release` / `dependency-update` / `security-scan`)——
-  GitHub **只读 `.github/workflows/`**;`.github/ISSUE_TEMPLATE/CODEOWNERS` 与 `.github/ISSUE_TEMPLATE/dependabot.yml` 同样**放错**(应在 `.github/` 根)。
+  GitHub **只读 `.github/workflows/`**;`.github/ISSUE_TEMPLATE/CODEOWNERS` 与
+  `.github/ISSUE_TEMPLATE/dependabot.yml` 同样**放错**(应在 `.github/` 根)。
 - **影响**:5 个 workflow + CODEOWNERS(而 `CONTRIBUTING.md:56` 的"至少一人审核"依赖它)+ 依赖更新 **全部不生效**。
 - **最小修复**:移到正确目录。其中 `harness/workflows/release.yml:33-39` 有一段**真正的联动硬检查**(CHANGELOG 里 grep 版本号,缺则 exit 1)—— 思路对,**值得优先救活**。
 
@@ -161,4 +162,9 @@ ast.parse(open(script).read())  # python
 ---
 
 ## 变更记录
-- 2026-09-11 建立。出具方:`agent-eval-gate`(外部);依据:通读本仓 `README.md` / `BluePrint.md` / `FillWorkflow.md` / `USAGE.md` + 实际落地文件(`.pre-commit-config.yaml` / `.github/` / `Makefile` / `scripts/` / `config/` / 各点文件)的逐一核对,所有结论均带 路径:行号 证据。
+
+- 2026-09-11 建立。出具方:`agent-eval-gate`(外部);依据:通读本仓
+  `README.md` / `BluePrint.md` / `FillWorkflow.md` / `USAGE.md`
+  \+ 实际落地文件(`.pre-commit-config.yaml` / `.github/` / `Makefile` /
+  `scripts/` / `config/` / 各点文件)的逐一核对,所有结论均带 路径:行号 证据。
+- 2026-09-11 标记 `[已修]`(H1–H14 处理完毕;另有 X1–X10)。

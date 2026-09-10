@@ -17,15 +17,15 @@
 
 ### 阶段 2：扩展 5 个（可选）
 
-7. 安全 Agent → rules/security-standard.md
-8. 性能 Agent → rules/performance-standard.md
-9. 重构 Agent → docs/anti-patterns.md
-10. 依赖 Agent → rules/dependency-standard.md
-11. 文档 Agent → docs/
+1. 安全 Agent → rules/security-standard.md
+2. 性能 Agent → rules/performance-standard.md
+3. 重构 Agent → docs/anti-patterns.md
+4. 依赖 Agent → rules/dependency-standard.md
+5. 文档 Agent → docs/
 
 ### 阶段 3：编排
 
-12. Orchestrator Agent 调度全部
+1. Orchestrator Agent 调度上面全部 Agent
 
 ## 每步之后
 

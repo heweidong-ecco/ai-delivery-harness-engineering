@@ -15,18 +15,21 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 ```
+
 ## 3. 安装钩子
 
 ```bash
 
 pre-commit install
 ```
+
 ## 4. 跑门禁
 
 ```bash
 
 make gate
 ```
+
 ## 5. 开始填充
 
 见 `docs/fill-guide.md`。
