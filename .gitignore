@@ -1,0 +1,25 @@
+# secrets
+.env
+*.pem
+*.key
+secrets/
+config/secrets/
+
+# build
+target/
+dist/
+build/
+node_modules/
+
+# ide
+.idea/
+.vscode/
+
+# logs
+*.log
+logs/
+
+# temp
+tmp/
+.DS_Store
+original_document/
