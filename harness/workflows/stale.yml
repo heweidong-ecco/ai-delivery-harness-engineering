@@ -3,6 +3,11 @@ name: Stale
 on:
   schedule:
     - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
 
 jobs:
   stale:
@@ -10,5 +15,30 @@ jobs:
     steps:
       - uses: actions/stale@v9
         with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
           days-before-stale: 30
           days-before-close: 7
+          days-before-pr-stale: 14
+          days-before-pr-close: 7
+
+          stale-issue-message: |
+            此 Issue 已 30 天无活动，将在 7 天后关闭。
+            如需保留，请添加 `keep-open` 标签或留言。
+
+          stale-pr-message: |
+            此 PR 已 14 天无活动，将在 7 天后关闭。
+            如需保留，请添加 `keep-open` 标签或留言。
+
+          close-issue-message: "此 Issue 因长期无活动已关闭。"
+          close-pr-message: "此 PR 因长期无活动已关闭。"
+
+          stale-issue-label: "stale"
+          stale-pr-label: "stale"
+
+          exempt-issue-labels: "keep-open,P0,P1,security"
+          exempt-pr-labels: "keep-open,P0,P1,security"
+
+          exempt-all-milestones: true
+
+          operations-per-run: 100

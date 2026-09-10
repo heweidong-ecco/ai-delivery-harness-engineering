@@ -2,10 +2,64 @@ name: Auto Label
 
 on:
   pull_request:
+    types: [opened, edited, synchronize]
+  issues:
     types: [opened, edited]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/labeler@v5
+      - name: Label by branch
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            const labels = [];
+            if (branch.startsWith('feature/')) labels.push('feature');
+            if (branch.startsWith('fix/')) labels.push('fix');
+            if (branch.startsWith('docs/')) labels.push('docs');
+            if (branch.startsWith('agent/')) labels.push('agent');
+            if (branch.startsWith('rule/')) labels.push('rule');
+            if (branch.startsWith('hotfix/')) labels.push('hotfix');
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                labels,
+              });
+            }
+
+      - name: Label by title
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = context.payload.pull_request.title.toLowerCase();
+            const labels = [];
+            if (title.startsWith('rule:')) labels.push('rule');
+            if (title.startsWith('agent:')) labels.push('agent');
+            if (title.startsWith('docs:')) labels.push('docs');
+            if (title.startsWith('ci:')) labels.push('ci');
+            if (title.startsWith('fix:')) labels.push('fix');
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                labels,
+              });
+            }
+
+      - name: Label by file path
+        if: github.event_name == 'pull_request'
+        uses: actions/labeler@v5
+        with:
+          configuration-path: .github/labeler.yml

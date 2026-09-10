@@ -3,11 +3,49 @@ name: Dependency Update
 on:
   schedule:
     - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: pip install pip-audit
-      - run: pip-audit
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install pip-audit pip-review
+
+      - name: Audit
+        run: pip-audit --strict || true
+
+      - name: Check outdated
+        run: pip-review --local --auto || true
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/dependency-update
+          commit-message: "chore: update dependencies"
+          title: "chore: update dependencies"
+          body: |
+            自动依赖更新。
+
+            检查项：
+            - [ ] CI 通过
+            - [ ] 无破坏性变更
+            - [ ] CHANGELOG 更新
+          labels: dependencies, chore
+          delete-branch: true

@@ -1,0 +1,42 @@
+rules:
+  - changed-files:
+      - any-glob-to-any-file: "harness/rules/**"
+
+skills:
+  - changed-files:
+      - any-glob-to-any-file: "harness/skills/**"
+
+wiki:
+  - changed-files:
+      - any-glob-to-any-file: "harness/wiki/**"
+
+agents:
+  - changed-files:
+      - any-glob-to-any-file: "harness/agents/**"
+      - any-glob-to-any-file: "harness/agent/**"
+
+pipeline:
+  - changed-files:
+      - any-glob-to-any-file: "harness/pipeline/**"
+
+changes:
+  - changed-files:
+      - any-glob-to-any-file: "harness/changes/**"
+
+scripts:
+  - changed-files:
+      - any-glob-to-any-file: "scripts/**"
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: ".github/workflows/**"
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file: "docs/**"
+      - any-glob-to-any-file: "**/*.md"
+
+security:
+  - changed-files:
+      - any-glob-to-any-file: "harness/rules/security-standard.md"
+      - any-glob-to-any-file: "scripts/check_secrets.py"
