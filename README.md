@@ -1,3 +1,7 @@
+> **状态**：v0.1.0-skeleton 已冻结。
+> 骨架 100% 完成，填充 0%，试点 0%。
+> 下一步：引入项目 → 跑 6 个核心 Agent → 空跑 REQ-0000。
+>
 # AI Delivery Harness Engineering
 
 > AI 代码上线 Harness 体系：用外部约束与反馈系统，让 AI 生成的代码真正可上线。
