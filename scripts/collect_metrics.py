@@ -1,6 +1,6 @@
 import json
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 
@@ -18,14 +18,14 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     data = {
-        "collected_at": datetime.now(timezone.utc).isoformat(),
+        "collected_at": datetime.now(UTC).isoformat(),
         "rule_commits": git_count("rule:"),
         "agent_commits": git_count("agent:"),
         "docs_commits": git_count("docs:"),
         "fix_commits": git_count("fix:"),
     }
 
-    out_file = out_dir / f"metrics-{datetime.now(timezone.utc):%Y%m%d}.json"
+    out_file = out_dir / f"metrics-{datetime.now(UTC):%Y%m%d}.json"
     out_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
     print(f"Metrics written to {out_file}")
 

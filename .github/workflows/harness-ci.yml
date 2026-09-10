@@ -54,6 +54,21 @@ jobs:
       - name: Check Harness docs
         run: python scripts/check_harness_docs.py
 
+      - name: Check stage gates
+        # 反外审 H5:阶段门原先不在任何链路里。这里对每个需求跑产出物门;
+        # 骨架期没有 harness/changes/REQ-* 时如实说明,而不是静默跳过。
+        run: |
+          shopt -s nullglob
+          reqs=(harness/changes/REQ-*)
+          if [ ${#reqs[@]} -eq 0 ]; then
+            echo "尚未创建 harness/changes/REQ-* 目录 —— 无需求可查(骨架期)"
+          else
+            for req in "${reqs[@]}"; do
+              echo "== 阶段门: $req"
+              bash scripts/check-gates.sh "$req"
+            done
+          fi
+
       - name: Validate schemas
         run: python scripts/validate_schemas.py
 
@@ -61,7 +76,9 @@ jobs:
         run: bandit -r src -q
 
       - name: pip-audit
-        run: pip-audit --strict || true
+        # 反外审 H11:原为 `pip-audit --strict || true`(CI 软),
+        # 与 scripts/check_dependencies.py(硬 fail)语义矛盾 —— 统一为硬。
+        run: pip-audit --strict
 
   commit-message:
     runs-on: ubuntu-latest

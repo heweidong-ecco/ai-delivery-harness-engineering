@@ -59,6 +59,16 @@ repos:
         pass_filenames: false
         args: ["src"]
 
+      # 反外审 H13:「跑测试」这条最重要的纪律,原先在提交环节**完全没有门** ——
+      # lint/format/type/密钥都拦了,唯独测试没有。这里补上。
+      - id: pytest
+        name: pytest
+        entry: pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        args: ["-q"]
+
       - id: check-commit-msg
         name: check commit message
         entry: python scripts/check_commit_msg.py

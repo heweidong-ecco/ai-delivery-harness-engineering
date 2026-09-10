@@ -7,21 +7,53 @@
 
 ## [Unreleased]
 
+> **2026-09-11 外审修正**:外部项目 `agent-eval-gate` 出具缺陷工单
+> (`.claude/AUDIT-外审记录与修正建议.md`),其中 **P0 三条表明门禁体系实质失效** ——
+> 详见 `harness/iteration/patch-log.md` §四 / §五。
+> 修正期间另发现 10 条同类缺陷(X1–X10),一并修掉。
+
 ### Added
 
-- 无
+- `harness/rules/logging-standard.md` —— 补上骨架承诺却未交付的那一份规则文件(骨架承诺 20 份、实交 19 份)
+- `scripts/stage_gate.py` —— **真状态机**:进入阶段前校验前置阶段 passed **且产出物现在依然存在**;`resume` 从第一个断点续跑
+- `harness/state/stages.json` —— 十阶段门配置(阶段 → 产出物),是 `stage_gate.py` 与 `check-gates.sh` 的**单一来源**
+- `tests/test_gates.py` —— **门禁防腐测试**:语法 / 可执行位 / 是否被注册 / 该拦必拦 + **反向验证**
+- `tests/test_tooling.py` —— `audit_log` / `collect_metrics` / `check_dependencies` 的测试(原先一条都没有)
+- `make` 目标:`setup` / `coverage` / `gates` / `state`;`markdownlint` / `yamllint` 改为复用 pre-commit 里已固定版本的 linter
+- pre-commit 增加 `pytest` 钩子(H13:提交环节原先没有测试门)
+- `check_secrets.py` 支持**行级豁免** `pragma: allowlist secret`(原先只能整文件跳过 = 永久盲区)
+- `check_harness_docs.py` 新增**代码围栏配平 / 嵌套**校验(实测曾有 6 个文件"开了没关")
 
 ### Changed
 
-- 无
+- `scripts/check_harness_docs.py`:**删掉硬编码 181 条路径**(实测 6 条不存在),改为「锚点文件 + 目录 glob + 文档形状 + 围栏配平」四层,并支持 `--root` 以便测试(H2)
+- `scripts/check-gates.sh`:**一次性检查 → 增量门** `--stage N`,且挂进 `make gates` 与 CI;顺带修掉原先**漏检 `review-record-v1.md`** 的缺口(H5)
+- `scripts/state_tracker.py`:降级为**校验型转发层**(不再自己写状态,无法再绕过前置校验)(H4)
+- `scripts/check_layers.py`:改为读 `.importlinter` 并委托 `lint-imports`;空转时**显式标注 `[UNIMPLEMENTED]`**,不再静默跳过(H6/H14)
+- `scripts/validate_schemas.py`:改做**真的** schema 自检;缺 `jsonschema` 时 **fail** 而非 `exit(0)`(H6/H9)
+- `harness/schemas/rule-schema.json`:`source` 进 required;**仅 P0** 强制带 `test`(按本仓 doctrine 精确编码)(H10)
+- 5 个 workflow 从 `harness/workflows/` 移入 `.github/workflows/`;`CODEOWNERS`、`dependabot.yml` 移入 `.github/`(H7)
+- `config/` 四份配置**显式标注为「示例、未接线」**,并写明要生效还缺什么(H8)
+- `ruff` 的 `T20` 按目录放行(`scripts/*`、`tests/*` 是 CLI 与测试);启用 **subprocess 覆盖率**(原先 741 条语句实测 0.00% —— 门禁测不到任何东西)
+- 文档层:修正 `docs/fill-workflow.md` 死引用、`harness/agent/`(单数)残留 8 处、README 目录树与实际不符(把 `agent/` 与 `agents/` 写成了两个目录)、去掉两份文档尾部的元文本、README 冻结状态改为与 `docs/freeze.md` 一致
 
 ### Fixed
 
-- 无
+- `scripts/check_harness_docs.py:1` 是 markdown 围栏 → SyntaxError → **该脚本永不执行**,而它被 `make gate` 与 CI 调用(H1,P0)
+- `tests/test_scripts.py` 用 `pytest.skip` 给坏门禁兜底(「门禁坏了就跳过它」)—— 已删,改为断言"它真的会拦"(H3,P0)
+- `tests/conftest.py` 的 `pytest_report_*` fixture 名为 `pytest_*`,被 pytest 当 hook 注册 → `PluginValidationError`,**测试套件连收集都跑不起来**(X3)
+- `check_secrets.py` 拦自己的测试夹具 → 加行级豁免(X4)
+- `python-coding-standard.md` 是**两份文档拼接**(正文 + 重复的"（模板）"副本) → 去重(X8)
+- `.gitignore` 补上 `.coverage` / `__pycache__` / `*.egg-info` / `pytest-report.json` 等构建产物(原先 `git status` 里一直挂着)
 
 ### Removed
 
-- 无
+- `harness/agents/1.md`(0 字节孤儿文件,全仓无引用;经业主确认删除)
+- CI 与 Makefile 里的 `|| true` 软失败(H11/H12);`harness/workflows/dependency-update.yml` 里冗余的软审计
+
+### 结果
+
+- `make gate` **首次全绿**(136 个测试通过,覆盖率 84%)—— 此前因 H1/H2/H3/X1/X2/X3/X4 从未绿过
 
 ---
 

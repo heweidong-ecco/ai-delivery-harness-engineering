@@ -27,7 +27,7 @@
 | ----------------- | ----------------------------- | -------------- |
 | Orchestrator      | orchestrator.md               | 调度全部 Agent |
 | Fill Harness      | fill-harness.md               | 填充总纲       |
-| Application Owner | ../agent/application-owner.md | 需求编排       |
+| Application Owner | application-owner.md          | 需求编排       |
 
 ## 四、执行顺序
 
@@ -50,7 +50,7 @@
 
 ## 六、Agent 输出通用格式
 
-```markdown
+````markdown
 ## 规则 ID: <DOMAIN>-<NNN>
 
 ### 规则
@@ -83,6 +83,7 @@ P0/P1/P2
 
 ### 来源
 <来源路径>
+````
 
 ## 七、人工审核要点
 

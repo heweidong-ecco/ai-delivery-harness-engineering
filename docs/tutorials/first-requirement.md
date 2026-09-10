@@ -22,3 +22,4 @@
 
 ```bash
 ./scripts/check-gates.sh harness/changes/REQ-0001
+```

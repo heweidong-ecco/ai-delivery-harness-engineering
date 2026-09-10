@@ -21,3 +21,4 @@
 
 ```bash
 python scripts/audit_log.py <event> <detail>
+```

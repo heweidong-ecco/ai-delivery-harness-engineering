@@ -23,6 +23,7 @@
 - [十三、目录速查](#十三目录速查)
 - [十四、FAQ](#十四faq)
 - [十五、下一步](#十五下一步)
+- [十六、总结](#十六总结)
 
 ---
 
@@ -251,8 +252,7 @@ cp kit/CHANGELOG.md .
 
 - `README.md`：改成你的项目
 - `LICENSE`：改成你的
-- `CODEOWNERS`：改成你的团队
-- `CODEOWNERS`：`@your-team` 替换
+- `CODEOWNERS`：改成你的团队（把 `@your-team` 等占位句柄替换掉）
 
 ### 步骤 5：初始化
 
@@ -310,7 +310,11 @@ make gate
 | `monitoring.md`        | 你的监控 |
 | `rollback-playbook.md` | 你的回滚 |
 
-### 7.5 `harness/agent/`
+### 7.5 `harness/agents/`
+
+> 角色定义与填充 Agent **同在一个目录**:`application-owner*.md` 是角色定义,
+> 其余 14 个 `*-agent.md` / `orchestrator.md` / `fill-harness.md` 是填充 Agent
+> (见 `harness/agents/README.md`)。
 
 | 文件                          | 修改内容               |
 | ----------------------------- | ---------------------- |
@@ -344,6 +348,11 @@ make gate
 | `harness-ci.yml` | 你的 Python 版本、命令 |
 
 ### 7.9 `config/`
+
+> ⚠ 这四份都是**示例、且未接线** —— 骨架期没有任何进程加载它们
+> (`src/` 为空,没有服务监听 8000;`alert-rules.yml` 里的指标名也尚未产出)。
+> 反外审 H8:原先不说明这点,读者会以为本仓已有观测能力。
+> 每一份文件头部都写明了"要让它生效还缺什么"。
 
 | 文件                     | 修改内容     |
 | ------------------------ | ------------ |
@@ -396,11 +405,12 @@ harness/agents/refactor-agent.md
 harness/agents/dependency-agent.md
 harness/agents/doc-agent.md
 
-# 可选工作流
-harness/workflows/auto-label.yml
-harness/workflows/stale.yml
-harness/workflows/release.yml
-harness/workflows/dependency-update.yml
+# 可选工作流(GitHub 只读 .github/workflows/,勿放 harness/ 下)
+.github/workflows/auto-label.yml
+.github/workflows/stale.yml
+.github/workflows/release.yml
+.github/workflows/dependency-update.yml
+.github/workflows/security-scan.yml
 
 # 可选文档
 docs/adr/
@@ -429,7 +439,8 @@ scripts/check_dependencies.py
 
 **删除后记得同步更新**：
 
-- `scripts/check_harness_docs.py` 的 `REQUIRED` 列表；
+- `scripts/check_harness_docs.py` 的 `ANCHORS` / `DIRECTORIES` 清单
+  (原先是硬编码 181 条 `REQUIRED` 路径,已改为「锚点文件 + 目录 glob」);
 - `Makefile` 的 target；
 - `.github/workflows/harness-ci.yml` 的 steps。
 
@@ -550,7 +561,7 @@ cp harness/changes/_template/*.md harness/changes/REQ-0001/
 
 ### 场景 4：填充规则
 
-见 `docs/fill-workflow.md`。
+见 `FillWorkflow.md`。
 
 ### 场景 5：空跑
 
@@ -584,20 +595,20 @@ git push origin v1.0.0
 
 ## 十三、目录速查
 
-| 我想...       | 去看                                 |
-| ------------- | ------------------------------------ |
-| 理解架构      | `docs/architecture.md`               |
-| 填充 Harness  | `docs/fill-workflow.md`              |
-| 看十阶段      | `harness/pipeline/stages.md`         |
-| 看 Agent 定义 | `harness/agent/application-owner.md` |
-| 写规则        | `harness/rules/_template.md`         |
-| 写 Skill      | `harness/skills/_template/SKILL.md`  |
-| 跑 Agent      | `harness/agents/README.md`           |
-| 看反模式      | `docs/anti-patterns.md`              |
-| 看最佳实践    | `docs/best-practices.md`             |
-| 看 FAQ        | `docs/faq.md`                        |
-| 看度量        | `harness/metrics/metrics.md`         |
-| 看 Patch      | `harness/iteration/patch-log.md`     |
+| 我想...       | 去看                                  |
+| ------------- | ------------------------------------- |
+| 理解架构      | `docs/architecture.md`                |
+| 填充 Harness  | `FillWorkflow.md`                     |
+| 看十阶段      | `harness/pipeline/stages.md`          |
+| 看 Agent 定义 | `harness/agents/application-owner.md` |
+| 写规则        | `harness/rules/_template.md`          |
+| 写 Skill      | `harness/skills/_template/SKILL.md`   |
+| 跑 Agent      | `harness/agents/README.md`            |
+| 看反模式      | `docs/anti-patterns.md`               |
+| 看最佳实践    | `docs/best-practices.md`              |
+| 看 FAQ        | `docs/faq.md`                         |
+| 看度量        | `harness/metrics/metrics.md`          |
+| 看 Patch      | `harness/iteration/patch-log.md`      |
 
 ---
 
@@ -622,7 +633,7 @@ git push origin v1.0.0
 harness/rules/
 harness/skills/
 harness/changes/_template/
-harness/agent/
+harness/agents/
 scripts/
 .github/workflows/harness-ci.yml
 pyproject.toml
@@ -647,7 +658,7 @@ Makefile
 
 ### Q7：怎么开始填充？
 
-见 `docs/fill-workflow.md`。
+见 `FillWorkflow.md`。
 
 ### Q8：多久能见效？
 
@@ -669,7 +680,7 @@ Makefile
 2. 按 [七、复制后必须修改的内容](#七复制后必须修改的内容) 改；
 3. 按 [十、环境准备](#十环境准备) 装；
 4. 按 [十一、首次验证](#十一首次验证) 验证；
-5. 按 `docs/fill-workflow.md` 填充；
+5. 按 `FillWorkflow.md` 填充；
 6. 空跑 REQ-0000；
 7. 试点 REQ-0001；
 8. 度量；
@@ -687,12 +698,13 @@ Makefile
 
 ## 十六、总结
 
-| 文档                    | 作用           | 面向                 |
-| ----------------------- | -------------- | -------------------- |
-| `USAGE.md`              | 怎么用这个 kit | 使用者、复制者       |
-| `FillWorkflow.md`       | 怎么填充内容   | 填充者、Agent 操作者 |
-| `BluePrint.md`          | 蓝图         | 核心内容总设计文档 |
-**两份文档覆盖**：
+| 文档              | 作用           | 面向                 |
+| ----------------- | -------------- | -------------------- |
+| `USAGE.md`        | 怎么用这个 kit | 使用者、复制者       |
+| `FillWorkflow.md` | 怎么填充内容   | 填充者、Agent 操作者 |
+| `BluePrint.md`    | 蓝图           | 核心内容总设计文档   |
+
+**三份文档覆盖**：
 
 - 从拿到 kit 到复制出去；
 - 从复制出去到改完；

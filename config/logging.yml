@@ -1,3 +1,12 @@
+# ⚠ 骨架示例 ——【未接线】。
+#
+# 反外审 H8:全仓没有任何代码加载本文件(`grep -rn "logging.yml"` 只命中文档与
+# `scripts/check_harness_docs.py` 的存在性检查)。日志规则本身见
+# `harness/rules/logging-standard.md`(LOG-001:禁止 print,统一用 logging)。
+#
+# 接线方式:在项目入口按 `logging.config.dictConfig(...)` 加载本文件,
+# 再按项目实际需要调整格式与级别。
+
 version: 1
 formatters:
   json:

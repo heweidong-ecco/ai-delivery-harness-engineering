@@ -43,5 +43,9 @@ jobs:
         with:
           generate_release_notes: true
           draft: false
-          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}
+          # 折行写(yamllint line-length max=120);`>-` 会把换行折叠成空格,表达式不变。
+          prerelease: >-
+            ${{ contains(github.ref_name, '-rc')
+            || contains(github.ref_name, '-beta')
+            || contains(github.ref_name, '-alpha') }}
           body_path: CHANGELOG.md

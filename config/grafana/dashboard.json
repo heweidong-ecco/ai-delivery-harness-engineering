@@ -1,9 +1,10 @@
 {
+  "_comment": "⚠ 骨架示例 ——【未接线】且【未填内容】。反外审 H8:原先每个 panel 只有 title 与 type,既没有 datasource 也没有 targets/query,甚至连 Grafana 导出格式都不完整(缺 schemaVersion / uid / gridPos);panel 标题里的指标名(AI 代码率 / 返工轮次 / 门禁通过率 / 覆盖率)也并非真实存在的 Prometheus 指标。放在这里容易被误读成本仓已有看板。接线前请勿据此认为本仓有观测能力。填充方式:在 Grafana 里真正建一次看板后导出 JSON 覆盖本文件。度量口径见 harness/metrics/dashboard.md。",
   "title": "Harness Dashboard",
   "panels": [
-    { "title": "AI 代码率", "type": "graph" },
-    { "title": "返工轮次", "type": "graph" },
-    { "title": "门禁通过率", "type": "graph" },
-    { "title": "覆盖率", "type": "graph" }
+    { "title": "AI 代码率", "type": "graph", "_unimplemented": true },
+    { "title": "返工轮次", "type": "graph", "_unimplemented": true },
+    { "title": "门禁通过率", "type": "graph", "_unimplemented": true },
+    { "title": "覆盖率", "type": "graph", "_unimplemented": true }
   ]
 }

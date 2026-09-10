@@ -1,5 +1,5 @@
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 
@@ -14,7 +14,7 @@ def main() -> None:
     out_dir = Path("harness/audit")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     out_file = out_dir / f"{now:%Y%m%d-%H%M%S}-{event}.md"
     out_file.write_text(
         f"# {event}\n\n- 时间：{now.isoformat()}\n- 详情：{detail}\n",

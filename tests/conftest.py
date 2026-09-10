@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import json
+import os
 from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
-
 
 # ============================================================
 # 路径 fixture
@@ -39,6 +39,58 @@ def docs_root(project_root: Path) -> Path:
 
 
 # ============================================================
+# subprocess 覆盖率
+# ============================================================
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _subprocess_coverage(tmp_path_factory: pytest.TempPathFactory, project_root: Path) -> None:
+    """让 tests 里以 **subprocess** 方式运行的脚本也计入覆盖率。
+
+    本仓的脚本几乎全部靠 `subprocess.run([sys.executable, "scripts/..."])` 驱动,
+    子进程是另一个解释器 —— 进程内覆盖率**看不见**它们。不处理这一点,
+    `.coveragerc` 里的 `fail_under` 就永远指向一个 0.00% 的假数字
+    (实测:741 条语句、0% 覆盖),覆盖率门禁形同虚设。
+
+    做法是 coverage 支持的进程启动机制:往 PYTHONPATH 放一个 `sitecustomize.py`,
+    它调用 `coverage.process_startup()`;子进程据此把覆盖率写进
+    `.coverage.*` 并行数据文件,由 pytest-cov 在收尾时合并。
+    """
+    boot = tmp_path_factory.mktemp("covboot")
+    (boot / "sitecustomize.py").write_text(
+        "try:\n"
+        "    import coverage\n"
+        "\n"
+        "    coverage.process_startup()\n"
+        "except Exception:  # coverage 不可用时静默降级,不影响被测脚本\n"
+        "    pass\n",
+        encoding="utf-8",
+    )
+    # 子进程用的配置必须把 `source` 写成**绝对路径** —— 子进程的 cwd 不一定是
+    # 仓库根(有些测试刻意在 tmp_path 里跑,避免往本仓写产物);
+    # 而 .coveragerc 里的 `source = src, scripts` 是相对路径,在 tmp_path 下根本
+    # 解析不到,表现为"脚本明明测过却是 0%"。
+    child_rc = boot / "coveragerc"
+    child_rc.write_text(
+        "[run]\n"
+        "branch = True\n"
+        "parallel = True\n"
+        f"source =\n    {project_root / 'src'}\n    {project_root / 'scripts'}\n"
+        "omit =\n    */tests/*\n    */__init__.py\n"
+        "[report]\n"
+        "exclude_lines =\n"
+        "    pragma: no cover\n"
+        "    if __name__ == .__main__.:\n",
+        encoding="utf-8",
+    )
+    os.environ["COVERAGE_PROCESS_START"] = str(child_rc)
+    # 同上:并行数据文件默认落在子进程的 cwd,固定为绝对路径才收得回来。
+    os.environ["COVERAGE_FILE"] = str(project_root / ".coverage")
+    existing = os.environ.get("PYTHONPATH", "")
+    os.environ["PYTHONPATH"] = f"{boot}{os.pathsep}{existing}" if existing else str(boot)
+
+
+# ============================================================
 # 临时目录 fixture
 # ============================================================
 
@@ -52,20 +104,23 @@ def tmp_python_file(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def sample_req_dir(tmp_path: Path) -> Iterator[Path]:
-    """完整的临时需求目录。"""
+def sample_req_dir(tmp_path: Path, project_root: Path) -> Iterator[Path]:
+    """完整的临时需求目录。
+
+    直接**复制真实的变更模板**(`harness/changes/_template/`)并替换 REQ 占位符 ——
+    而不是手写一份"看起来像"的内容。原先手写的版本与真实模板并不一致
+    (例如 `ci-result.md` 被写成 `- Status: SUCCESS` 列表,而真实模板写的是
+    `## 可程序化验证条件` 段落),这种 fixture 会让测试对着一个假契约变绿。
+    """
     req_dir = tmp_path / "REQ-TEST"
     req_dir.mkdir()
-    files = {
-        "requirement-analysis.md": "# 需求分析\n\n## 背景\n\n## 目标\n",
-        "task-breakdown.md": "# 任务拆分\n\n| 任务 | 层 | 负责人 |\n|---|---|---|\n",
-        "coding-report.md": "# 编码报告\n\n## 改动文件\n",
-        "unit-test-report.md": "# 单测报告\n\n## 覆盖接口\n",
-        "ci-result.md": "# CI 结果\n\n- Status: SUCCESS\n- TotalTest: 1\n- Passed: 1\n",
-        "deploy-validation.md": "# 部署验证\n\n## 环境参数确认\n",
-    }
-    for name, content in files.items():
-        (req_dir / name).write_text(content, encoding="utf-8")
+    for template in sorted((project_root / "harness" / "changes" / "_template").glob("*.md")):
+        if template.name == "README.md":
+            continue
+        (req_dir / template.name).write_text(
+            template.read_text(encoding="utf-8").replace("REQ-XXXX", "REQ-TEST"),
+            encoding="utf-8",
+        )
     yield req_dir
 
 
@@ -83,8 +138,11 @@ def incomplete_req_dir(tmp_path: Path) -> Iterator[Path]:
 # ============================================================
 
 
+# 注:fixture 名**不能**以 `pytest_` 开头 —— pytest 会把 conftest 里所有
+# `pytest_*` 函数当作 hook 注册,名字对不上就 PluginValidationError(整个套件
+# 连收集都跑不起来)。原先这三个叫 `pytest_report_*`,正是这个坑。
 @pytest.fixture
-def pytest_report_passed(tmp_path: Path) -> Path:
+def passed_report(tmp_path: Path) -> Path:
     """通过的 pytest 报告。"""
     f = tmp_path / "report-passed.json"
     f.write_text(
@@ -95,7 +153,7 @@ def pytest_report_passed(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def pytest_report_failed(tmp_path: Path) -> Path:
+def failed_report(tmp_path: Path) -> Path:
     """失败的 pytest 报告。"""
     f = tmp_path / "report-failed.json"
     f.write_text(
@@ -106,7 +164,7 @@ def pytest_report_failed(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def pytest_report_zero_tests(tmp_path: Path) -> Path:
+def zero_test_report(tmp_path: Path) -> Path:
     """测试数为 0 的报告。"""
     f = tmp_path / "report-zero.json"
     f.write_text(
@@ -141,7 +199,7 @@ def call_api(url: str) -> None:
 @pytest.fixture
 def sample_bad_code() -> str:
     """违反多条规则的代码。"""
-    return '''
+    return """
 import requests
 
 def get_price(price: float) -> None:
@@ -151,7 +209,7 @@ def get_price(price: float) -> None:
         eval("1+1")
     except:
         pass
-'''
+"""
 
 
 @pytest.fixture

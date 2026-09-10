@@ -11,11 +11,30 @@ dist/
 build/
 node_modules/
 
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 测试 / 覆盖率产物(跑完 make gate 会生成;原先漏了这几条,
+# 于是 `git status` 里一直挂着一堆构建产物,提交时容易误入)
+.coverage
+.coverage.*
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.import_linter_cache/
+htmlcov/
+pytest-report.json
+
+# 生成的度量数据(由 scripts/collect_metrics.py 产出,make clean 会删除)
+harness/metrics/data/*.json
+
 # ide
 .idea/
 .vscode/
-
-.env
 
 # logs
 *.log

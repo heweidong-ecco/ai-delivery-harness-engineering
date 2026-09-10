@@ -4,7 +4,7 @@
 # Harness
 /harness/rules/ @rule-owner
 /harness/skills/ @skill-owner
-/harness/agent/ @agent-owner
+/harness/agents/ @agent-owner
 /harness/sources/ @source-owner
 /scripts/ @ci-owner
 /.github/ @ci-owner

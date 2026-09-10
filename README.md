@@ -1,9 +1,9 @@
 > **项目蓝图**：见 [BluePrint.md](./BluePrint.md)
 > **使用指南**：见 [USAGE.md](./USAGE.md)
 > **填充工作流**：见 [FillWorkflow.md](./FillWorkflow.md)
-> **状态**：v0.1.0-skeleton 已冻结。
+> **状态**：v0.1.0-skeleton **已于 2026-09-11 解冻**，用于修正外审缺陷 H1–H14（见 `docs/freeze.md`）。
 > 骨架 100% 完成，填充 0%，试点 0%。
-> 下一步：引入项目 → 跑 6 个核心 Agent → 空跑 REQ-0000。
+> 下一步：修完 H1–H14 → 由业务方决定是否重新冻结 → 引入项目 → 跑 6 个核心 Agent → 空跑 REQ-0000。
 >
 # AI Delivery Harness Engineering
 
@@ -12,7 +12,7 @@
 [![CI](https://github.com/<org>/<repo>/actions/workflows/harness-ci.yml/badge.svg)](https://github.com/<org>/<repo>/actions/workflows/harness-ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
-[![Status](https://img.shields.io/badge/status-skeleton--frozen-green)]()
+[![Status](https://img.shields.io/badge/status-skeleton--unfrozen-orange)]()
 
 ---
 
@@ -306,12 +306,18 @@ ai-delivery-harness-engineering/
 │
 ├── .github/
 │   ├── workflows/
-│   │   └── harness-ci.yml                 # 主 CI 工作流
+│   │   ├── harness-ci.yml                 # 主 CI 工作流
+│   │   ├── auto-label.yml                 # 自动标签
+│   │   ├── stale.yml                      # 过期 Issue
+│   │   ├── release.yml                    # 发布
+│   │   ├── dependency-update.yml          # 依赖更新
+│   │   └── security-scan.yml              # 安全扫描
 │   ├── PULL_REQUEST_TEMPLATE.md           # PR 模板
 │   ├── ISSUE_TEMPLATE/
 │   │   ├── bug_report.md                  # Bug 模板
 │   │   ├── feature_request.md             # 需求模板
 │   │   └── config.yml                     # Issue 配置
+│   ├── labeler.yml                        # 标签规则
 │   ├── CODEOWNERS                         # 代码所有者
 │   └── dependabot.yml                     # 依赖更新
 │
@@ -319,18 +325,19 @@ ai-delivery-harness-engineering/
 │   ├── settings.json                      # VSCode 配置
 │   └── extensions.json                    # 推荐扩展
 │
-├── config/
+├── config/                                # 观测配置(示例,**均未接线** —— 见各文件头部说明)
 │   ├── prometheus.yml                     # Prometheus 示例
-│   ├── alert-rules.yml                    # 告警规则示例
-│   ├── logging.yml                        # 日志配置示例
+│   ├── alert-rules.yml                    # 告警规则示例(指标名尚未产出)
+│   ├── logging.yml                        # 日志配置示例(暂无消费者)
 │   └── grafana/
-│       └── dashboard.json                 # Grafana 面板示例
+│       └── dashboard.json                 # Grafana 面板示例(无 datasource/query)
 │
 ├── docs/
 │   ├── quickstart.md                      # 快速开始
 │   ├── fill-guide.md                      # 填充指南
 │   ├── faq.md                             # FAQ
 │   ├── architecture.md                    # 骨架架构
+│   ├── freeze.md                          # 冻结 / 解冻记录
 │   ├── naming-conventions.md              # 命名约定
 │   ├── versioning.md                      # 版本策略
 │   ├── anti-patterns.md                   # 反模式
@@ -442,10 +449,6 @@ ai-delivery-harness-engineering/
 │   │       ├── ci-result.md               # CI 结果
 │   │       └── deploy-validation.md       # 部署验证
 │   │
-│   ├── agent/                             # Agent 角色
-│   │   ├── application-owner.md           # 编排主角色
-│   │   └── application-owner-python.md    # Python 扩展
-│   │
 │   ├── pipeline/                          # 流水线
 │   │   ├── stages.md                      # 十阶段
 │   │   ├── human-checkpoints.md           # 五个人工确认点
@@ -476,10 +479,13 @@ ai-delivery-harness-engineering/
 │   │   ├── flows/                         # 流程
 │   │   └── code/                          # 代码
 │   │
-│   ├── agents/                            # 填充 Agent
+│   ├── agents/                            # Agent 角色(定义 + 填充,同一目录)
 │   │   ├── README.md                      # Agent 索引
 │   │   ├── orchestrator.md                # 编排
 │   │   ├── fill-harness.md                # 填充总纲
+│   │   ├── orchestrator-report.md         # 编排报告
+│   │   ├── application-owner.md           # 编排主角色
+│   │   ├── application-owner-python.md    # Python 扩展
 │   │   ├── architecture-agent.md          # 架构解析
 │   │   ├── incident-agent.md              # 事故反推
 │   │   ├── review-agent.md                # Review 提炼
@@ -492,15 +498,16 @@ ai-delivery-harness-engineering/
 │   │   ├── dependency-agent.md            # 依赖
 │   │   └── doc-agent.md                   # 文档
 │   │
-│   ├── workflows/                         # 辅助工作流
-│   │   ├── auto-label.yml                 # 自动标签
-│   │   ├── stale.yml                      # 过期 Issue
-│   │   ├── release.yml                    # 发布
-│   │   ├── dependency-update.yml          # 依赖更新
-│   │   └── security-scan.yml              # 安全扫描
+│   ├── glossary/                          # 领域术语索引
+│   │   └── README.md
+│   │
+│   ├── pilot/                             # 空跑与试点
+│   │   ├── runbook.md                     # 空跑手册
+│   │   └── findings.md                    # 空跑发现
 │   │
 │   ├── state/                             # 需求状态
-│   │   └── README.md
+│   │   ├── README.md
+│   │   └── stages.json                    # 十阶段门配置(阶段 → 产出物)
 │   │
 │   ├── audit/                             # 审计
 │   │   └── README.md
@@ -511,7 +518,7 @@ ai-delivery-harness-engineering/
 │   └── schemas/                           # Schema
 │       ├── rule-schema.json
 │       ├── skill-schema.json
-│       └── data/
+│       └── data/                          # 数据文件(填充时创建;不存在时门禁会显式标注未实现)
 │
 ├── scripts/                               # 检查脚本
 │   ├── check_pytest_report.py             # 测试报告检查
@@ -525,9 +532,10 @@ ai-delivery-harness-engineering/
 │   ├── check_i18n.py                      # 国际化检查
 │   ├── collect_metrics.py                 # 度量采集
 │   ├── audit_log.py                       # 审计记录
-│   ├── state_tracker.py                   # 状态跟踪
+│   ├── state_tracker.py                   # 状态跟踪(已弃用,转发到 stage_gate)
+│   ├── stage_gate.py                      # 阶段状态机(前置校验 + resume)
 │   ├── validate_schemas.py                # Schema 校验
-│   ├── check_gates.sh                     # 门禁检查
+│   ├── check-gates.sh                     # 阶段产出物门(增量 --stage)
 │   ├── install-hooks.sh                   # 安装钩子
 │   └── dev-setup.sh                       # 开发环境
 │
@@ -636,7 +644,10 @@ harness/changes/REQ-XXXX/
 - 旧版本永远不删；
 - 全流程可追溯。
 
-### 5. Agent 角色（`harness/agent/`）
+### 5. Agent 角色（`harness/agents/`）
+
+> 角色定义（`application-owner*.md`）与填充 Agent（`*-agent.md`、`orchestrator.md`、
+> `fill-harness.md`，共 14 个）**同在一个目录**；索引见 `harness/agents/README.md`。
 
 **Application Owner**：整套体系的编排中枢，约 400 行，包含 5 个模块：
 
@@ -831,7 +842,7 @@ docker compose up harness
 1. Fork 或克隆本仓库；
 2. 阅读 `docs/architecture.md` 理解整体架构；
 3. 阅读 `harness/pipeline/stages.md` 理解十阶段流水线；
-4. 阅读 `harness/agent/application-owner.md` 理解编排逻辑；
+4. 阅读 `harness/agents/application-owner.md` 理解编排逻辑；
 5. 按 `docs/fill-guide.md` 用 Agent 填充具体项目内容；
 6. 团队按十阶段流水线执行。
 
@@ -1478,7 +1489,7 @@ MIT，见 [LICENSE](./LICENSE)。
 | 填充 Harness   | `docs/fill-guide.md`                 |
 | 理解架构       | `docs/architecture.md`               |
 | 看十阶段       | `harness/pipeline/stages.md`         |
-| 看 Agent 定义  | `harness/agent/application-owner.md` |
+| 看 Agent 定义  | `harness/agents/application-owner.md` |
 | 写第一条规则   | `harness/rules/_template.md`         |
 | 写第一个 Skill | `harness/skills/_template/SKILL.md`  |
 | 跑 Agent 填充  | `harness/agents/README.md`           |
@@ -1494,37 +1505,3 @@ MIT，见 [LICENSE](./LICENSE)。
 >
 > **这和传统软件质量保障思路一脉相承：我们不指望程序员写出零缺陷代码，而是通过 Code Review、Unit Testing、CI/CD 来确保缺陷被层层拦截。Harness 做的事情本质上完全一样，只不过拦截对象从程序员变成了 Agent。**
 
----
-
-## 使用说明
-
-1. 把上面内容**完整复制**到仓库根目录的 `README.md`。
-2. 把 `<org>/<repo>` 替换成你的实际 GitHub 地址。
-3. 把 `<security@example.com>` 替换成你的安全邮箱。
-4. 提交：
-
-```bash
-git checkout -b docs/readme-full
-git add README.md
-git commit -m "docs: add full README with complete guide"
-git push -u origin docs/readme-full
-gh pr create --title "Full README" --body "完整版 README：介绍、架构、目录、使用方法、填充指南、CI、度量、FAQ。"
-```
-
-这份 README 覆盖：
-
-- 项目定位与理念
-- 完整架构图
-- 完整目录结构
-- 核心组件详解
-- 十阶段流水线
-- 快速开始
-- 八种使用场景
-- 填充指南
-- CI 与门禁
-- 度量指标
-- 五条关键经验
-- 十条 FAQ
-- 贡献指南
-- 版本与路线图
-- 快速导航

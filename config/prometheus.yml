@@ -1,3 +1,16 @@
+# ⚠ 骨架示例 ——【未接线】,不是"已有监控"。
+#
+# 反外审 H8:原先这份配置**没有任何消费者** —— 骨架期 `src/` 无代码、
+# 没有服务监听 8000、也没有 Prometheus 实例来抓它。放在这里容易被误读成
+# "本仓已有观测能力"。
+#
+# 接线之前请勿据此认为本仓有监控。要让它真的生效,至少需要:
+#   1. `src/` 里有对外暴露指标的进程(或在 CI 之后导出度量);
+#   2. 一个 Prometheus 实例加载本文件;
+#   3. `config/alert-rules.yml` 里的告警指标名真实存在(见该文件的说明)。
+#
+# 指标口径见 `harness/metrics/metrics.md`,采集见 `harness/metrics/collection.md`。
+
 global:
   scrape_interval: 15s
 

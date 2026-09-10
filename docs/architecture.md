@@ -89,7 +89,7 @@ L7 持续迭代层
 | 层        | 目录                                 |
 | --------- | ------------------------------------ |
 | L1 治理   | harness/rules/                       |
-| L2 编排   | harness/agent/                       |
+| L2 编排   | harness/agents/                      |
 | L3 知识   | harness/skills/、harness/wiki/       |
 | L4 流水线 | harness/pipeline/                    |
 | L5 门禁   | scripts/、.github/workflows/         |

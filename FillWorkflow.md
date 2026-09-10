@@ -544,7 +544,7 @@ gh pr create --title "Agent: Incident" --body "事故反推"
 
 #### 输出示例
 
-```markdown
+````markdown
 ## 规则 ID: PAY-001
 
 ### 规则
@@ -583,7 +583,7 @@ P0
 
 ### 来源
 harness/sources/incidents/INC-2024-0421.md
-```
+````
 
 #### 审核清单
 
@@ -736,7 +736,7 @@ harness/rules/coding-standard.md
 
 #### 输出示例
 
-```markdown
+````markdown
 ## Service 层最佳实践
 文件：src/service/order_service.py
 理由：事务边界清晰，adapter 调用带 timeout，异常不吞。
@@ -763,7 +763,7 @@ class OrderService:
 ## Service 层反例
 文件：src/service/legacy_pay.py
 理由：直接 import requests，无 timeout，吞异常。
-```
+````
 
 ---
 
@@ -1511,42 +1511,8 @@ python scripts/collect_metrics.py
 **填充公式：真实来源 + 结构化 Prompt + 六件套输出 + 人工审核 + 可执行检查 = 厚实规则。**
 
 **没有来源，Agent 就编。没有审核，规则就假。没有检查，规则就空。没有测试，规则就死。**
-```
 
 ---
-
-## 使用建议
-
-### 放置位置
-
-```text
-your-repo/
-├── USAGE.md                    # 文档一（根目录）
-└── docs/
-    └── fill-workflow.md        # 文档二
-```
-
-### 在 README 中链接
-
-在 `README.md` 顶部加：
-
-```markdown
-> **使用指南**：见 [USAGE.md](./USAGE.md)
-> **填充工作流**：见 [docs/fill-workflow.md](./docs/fill-workflow.md)
-```
-
-### 提交
-
-```bash
-git checkout -b docs/usage-and-fill-workflow
-git add USAGE.md docs/fill-workflow.md README.md
-git commit -m "docs: add usage guide and fill workflow"
-git push -u origin docs/usage-and-fill-workflow
-gh pr create --title "Usage + Fill Workflow" --body "新增使用指南和填充工作流文档。"
-```
-
----
-
 ## 总结
 
 | 文档              | 作用           | 面向                 |
@@ -1555,7 +1521,7 @@ gh pr create --title "Usage + Fill Workflow" --body "新增使用指南和填充
 | `FillWorkflow.md` | 怎么填充内容   | 填充者、Agent 操作者 |
 | `BluePrint.md`    | 蓝图           | 核心内容总设计文档   |
 
-**两份文档覆盖**：
+**三份文档覆盖**：
 
 - 从拿到 kit 到复制出去；
 - 从复制出去到改完；

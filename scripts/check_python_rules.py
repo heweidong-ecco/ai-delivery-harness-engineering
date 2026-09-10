@@ -42,9 +42,7 @@ def _is_float_annotation(node: ast.expr | None) -> bool:
         return False
     if isinstance(node, ast.Name) and node.id == "float":
         return True
-    if isinstance(node, ast.Attribute) and node.attr == "float":
-        return True
-    return False
+    return isinstance(node, ast.Attribute) and node.attr == "float"
 
 
 def rule_price_no_float(ctx: RuleContext) -> None:
@@ -89,9 +87,12 @@ def rule_no_bare_except(ctx: RuleContext) -> None:
 def rule_no_print(ctx: RuleContext) -> None:
     """LOG-001：禁止 print。"""
     for node in ast.walk(ctx.tree):
-        if isinstance(node, ast.Call):
-            if isinstance(node.func, ast.Name) and node.func.id == "print":
-                ctx.report(node.lineno, "LOG-001", "禁止 print，请用 logging")
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "print"
+        ):
+            ctx.report(node.lineno, "LOG-001", "禁止 print，请用 logging")
 
 
 def rule_no_hardcoded_secrets(ctx: RuleContext) -> None:
@@ -100,23 +101,34 @@ def rule_no_hardcoded_secrets(ctx: RuleContext) -> None:
     for node in ast.walk(ctx.tree):
         if isinstance(node, ast.Assign):
             for target in node.targets:
-                if isinstance(target, ast.Name) and target.id.lower() in suspicious_names:
-                    if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
-                        if len(node.value.value) >= 8:
-                            ctx.report(node.lineno, "SEC-001", f"疑似硬编码密钥: {target.id}")
+                if (
+                    isinstance(target, ast.Name)
+                    and target.id.lower() in suspicious_names
+                    and isinstance(node.value, ast.Constant)
+                    and isinstance(node.value.value, str)
+                    and len(node.value.value) >= 8
+                ):
+                    ctx.report(node.lineno, "SEC-001", f"疑似硬编码密钥: {target.id}")
 
 
 def rule_no_naive_datetime(ctx: RuleContext) -> None:
     """TZ-001：禁止 naive datetime.now()。"""
     for node in ast.walk(ctx.tree):
-        if isinstance(node, ast.Call):
-            if isinstance(node.func, ast.Attribute):
-                if node.func.attr == "now":
-                    if isinstance(node.func.value, ast.Name) and node.func.value.id == "datetime":
-                        if not node.args and not any(kw.arg == "tz" for kw in node.keywords):
-                            ctx.report(node.lineno, "TZ-001", "禁止 naive datetime.now()，请用 datetime.now(UTC)")
-                if node.func.attr == "utcnow":
-                    ctx.report(node.lineno, "TZ-001", "datetime.utcnow() 已废弃，请用 datetime.now(UTC)")
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            if (
+                node.func.attr == "now"
+                and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "datetime"
+                and not node.args
+                and not any(kw.arg == "tz" for kw in node.keywords)
+            ):
+                ctx.report(
+                    node.lineno, "TZ-001", "禁止 naive datetime.now()，请用 datetime.now(UTC)"
+                )
+            if node.func.attr == "utcnow":
+                ctx.report(
+                    node.lineno, "TZ-001", "datetime.utcnow() 已废弃，请用 datetime.now(UTC)"
+                )
 
 
 def rule_no_mutable_default(ctx: RuleContext) -> None:
@@ -124,20 +136,24 @@ def rule_no_mutable_default(ctx: RuleContext) -> None:
     for node in ast.walk(ctx.tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             for default in node.args.defaults + node.args.kw_defaults:
-                if isinstance(default, (ast.List, ast.Dict, ast.Set)):
+                if isinstance(default, (ast.List, ast.Dict, ast.Set)) or (
+                    isinstance(default, ast.Call)
+                    and isinstance(default.func, ast.Name)
+                    and default.func.id in {"list", "dict", "set"}
+                ):
                     ctx.report(node.lineno, "PY-001", f"函数 {node.name} 使用可变默认参数")
-                elif isinstance(default, ast.Call):
-                    if isinstance(default.func, ast.Name) and default.func.id in {"list", "dict", "set"}:
-                        ctx.report(node.lineno, "PY-001", f"函数 {node.name} 使用可变默认参数")
 
 
 def rule_no_eval_exec(ctx: RuleContext) -> None:
     """SEC-002：禁止 eval/exec。"""
     banned = {"eval", "exec", "compile", "__import__"}
     for node in ast.walk(ctx.tree):
-        if isinstance(node, ast.Call):
-            if isinstance(node.func, ast.Name) and node.func.id in banned:
-                ctx.report(node.lineno, "SEC-002", f"禁止使用 {node.func.id}")
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id in banned
+        ):
+            ctx.report(node.lineno, "SEC-002", f"禁止使用 {node.func.id}")
 
 
 # ============================================================

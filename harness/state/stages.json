@@ -1,0 +1,15 @@
+{
+  "_comment": "十阶段流水线的【阶段门】配置(见 harness/pipeline/stages.md)。每个阶段列出它的 evidence(产出物);产出物必须真实存在且非空,否则该阶段不算通过。路径中的 {req} 会被替换为需求编号。消费方:scripts/stage_gate.py(真状态机)、scripts/check-gates.sh(增量门)。",
+  "stages": [
+    { "name": "需求分析", "evidence": ["harness/changes/{req}/requirement-analysis.md"] },
+    { "name": "需求评审", "evidence": ["harness/changes/{req}/review-record-v1.md"] },
+    { "name": "计划评审", "evidence": ["harness/changes/{req}/task-breakdown.md"] },
+    { "name": "编码实现", "evidence": ["harness/changes/{req}/coding-report.md"] },
+    { "name": "编码评审", "evidence": ["harness/changes/{req}/coding-report.md"] },
+    { "name": "单测编写", "evidence": ["harness/changes/{req}/unit-test-report.md"] },
+    { "name": "单测评审", "evidence": ["harness/changes/{req}/unit-test-report.md"] },
+    { "name": "CI 验证", "evidence": ["harness/changes/{req}/ci-result.md"] },
+    { "name": "部署验证", "evidence": ["harness/changes/{req}/deploy-validation.md"] },
+    { "name": "用户确认", "evidence": ["harness/checkpoints/{req}-HC5.md"] }
+  ]
+}

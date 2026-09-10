@@ -27,11 +27,14 @@ jobs:
           pip install -e ".[dev]"
           pip install pip-audit pip-review
 
-      - name: Audit
-        run: pip-audit --strict || true
+      # 依赖审计**不在这里做**:本 workflow 的职责是「发现过期依赖并开 PR」,
+      # 审计失败不应该阻断更新(有漏洞时反而更需要更新)。
+      # 漏洞扫描是 security-scan.yml(每日)与 harness-ci.yml(每次 PR)的硬门职责,
+      # 原先这里那句 `pip-audit --strict || true` 既拦不住、又给不出信号 —— 已删除。
 
       - name: Check outdated
-        run: pip-review --local --auto || true
+        # 去掉 `|| true`:工具本身失败(pip-review 崩了/没装上)必须暴露,不能假装跑过。
+        run: pip-review --local --auto
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v6

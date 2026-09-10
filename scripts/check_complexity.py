@@ -39,11 +39,22 @@ def cyclomatic_complexity(node: ast.AST) -> int:
     return complexity
 
 
+NESTING_NODES = (
+    ast.If,
+    ast.For,
+    ast.AsyncFor,
+    ast.While,
+    ast.With,
+    ast.AsyncWith,
+    ast.Try,
+)
+
+
 def max_nesting(node: ast.AST, depth: int = 0) -> int:
     """计算最大嵌套深度。"""
     max_depth = depth
     for child in ast.iter_child_nodes(node):
-        if isinstance(child, (ast.If, ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith, ast.Try)):
+        if isinstance(child, NESTING_NODES):
             max_depth = max(max_depth, max_nesting(child, depth + 1))
         else:
             max_depth = max(max_depth, max_nesting(child, depth))

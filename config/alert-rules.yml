@@ -1,13 +1,27 @@
+# ⚠ 骨架示例 ——【未接线】,不是"已有告警"。
+#
+# 反外审 H8:下面两条规则的指标名 **`gate_pass_rate` 与 `coverage` 在全仓不存在** ——
+# 没有任何地方产出它们(`src/__init__.py` 为空,`scripts/collect_metrics.py`
+# 产出的是 `rule_commits` / `agent_commits` / `docs_commits` / `fix_commits`)。
+# 也就是说:即使接了 Prometheus,这两条告警也**永远不会触发**,
+# 却会让人以为"门禁失败 / 覆盖率过低会被告警"。
+#
+# 接线时必须二选一:
+#   a. 真的产出这两个指标(推荐:在 CI 里导出为 textfile collector 格式);
+#   b. 改成实际存在的指标名(如 `harness_fix_commits`),否则删掉该条规则。
+#
+# 度量口径见 `harness/metrics/metrics.md` 与 `harness/metrics/sla.md`。
+
 groups:
   - name: harness
     rules:
       - alert: GateFailure
-        expr: gate_pass_rate < 0.9
+        expr: gate_pass_rate < 0.9          # TODO: 该指标尚未产出
         for: 10m
         labels:
           severity: P1
       - alert: CoverageLow
-        expr: coverage < 0.8
+        expr: coverage < 0.8                # TODO: 该指标尚未产出
         for: 5m
         labels:
           severity: P0

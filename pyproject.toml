@@ -14,6 +14,13 @@ dev = [
   "pytest-json-report>=1.5.0",
   "pre-commit>=3.8.0",
   "bandit>=1.7.9",
+  # 门禁依赖 —— 原先这三个只在文档/CI 里被"假定存在",未声明:
+  #   jsonschema   → scripts/validate_schemas.py(H9:缺依赖应 fail,故必须能装上)
+  #   import-linter→ .importlinter 分层契约(H14:定义了契约却无处运行)
+  #   pip-audit    → scripts/check_dependencies.py 与 CI(H11)
+  "jsonschema>=4.20",
+  "import-linter>=2.0",
+  "pip-audit>=2.7",
 ]
 
 [tool.ruff]
@@ -22,7 +29,17 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM", "C4", "DTZ", "T20", "ANN"]
-ignore = ["ANN101", "ANN102", "ANN401"]
+# ANN101/ANN102 已被 ruff 移除(忽略它们没有效果),不再列出。
+ignore = ["ANN401"]
+
+[tool.ruff.lint.per-file-ignores]
+# T20(禁止 print)针对的是 **src/ 业务代码**(对应 harness/rules 的 LOG-001:
+# 用 logging 而非 print)。但 scripts/ 下的门禁脚本**本体就是 CLI**,
+# 它们的产物就是给人看的输出;tests/ 亦然。
+# 原配置让 `ruff check .` 在**每一条 print** 上失败(实测 72 条),
+# 而 `gate`/CI 的第一步就是 ruff —— 也就是说这条 lint 门禁同样**从未绿过**。
+"scripts/*" = ["T201"]
+"tests/*" = ["T201"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -36,5 +53,8 @@ disallow_incomplete_defs = true
 no_implicit_optional = true
 
 [tool.pytest.ini_options]
-addopts = "-q --strict-markers --cov=src --cov-report=term-missing --cov-fail-under=80"
+# 覆盖率的**阈值**不在这里,也不在 .coveragerc 的 fail_under ——
+# 由 `make coverage` 执行,以便在骨架期(src/ 尚无代码)显式标注"未实现",
+# 而不是让一个测不到东西的 0.00% 假数字卡住整条 gate。
+addopts = "-q --strict-markers --cov --cov-report=term-missing"
 testpaths = ["tests"]

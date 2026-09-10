@@ -95,8 +95,10 @@ project-root/
 │   │       ├── unit-test-report.md
 │   │       ├── ci-result.md
 │   │       └── deploy-validation.md
-│   └── agent/
-│       └── application-owner.md        # 约 400 行，5 个模块
+│   └── agents/
+│       ├── application-owner.md        # 约 400 行，5 个模块
+│       ├── application-owner-python.md # Python 扩展
+│       └── *-agent.md                  # 填充 Agent(14 个)
 ├── src/
 └── ...
 ```
@@ -281,7 +283,7 @@ project-root/
 2. `harness/skills/`：9 个 Skill，核心为 Coding、Expert Reviewer、UnitTestRide。
 3. `harness/wiki/`：领域术语、数据模型、核心业务流程。
 4. `harness/changes/`：需求独立目录模板与全流程留痕。
-5. `harness/agent/application-owner.md`：约 400 行，5 模块。
+5. `harness/agents/application-owner.md`：约 400 行，5 模块。
 6. 十阶段流水线与质量门禁配置。
 7. CI 可程序化验证脚本。
 8. 评审模板、测试模板、部署参数确认模板。

@@ -13,7 +13,6 @@ wiki:
 agents:
   - changed-files:
       - any-glob-to-any-file: "harness/agents/**"
-      - any-glob-to-any-file: "harness/agent/**"
 
 pipeline:
   - changed-files:

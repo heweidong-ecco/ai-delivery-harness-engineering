@@ -2,9 +2,7 @@ import re
 import sys
 from pathlib import Path
 
-PATTERN = re.compile(
-    r"^(feat|fix|docs|ci|chore|rule|agent|test)(\(.+\))?: .{1,72}$"
-)
+PATTERN = re.compile(r"^(feat|fix|docs|ci|chore|rule|agent|test)(\(.+\))?: .{1,72}$")
 
 ALLOWED = {"feat", "fix", "docs", "ci", "chore", "rule", "agent", "test"}
 

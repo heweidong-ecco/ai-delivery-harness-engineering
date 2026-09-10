@@ -28,3 +28,4 @@
 
 ```bash
 ./scripts/check-gates.sh harness/changes/REQ-XXXX
+```
