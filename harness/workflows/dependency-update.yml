@@ -1,0 +1,13 @@
+name: Dependency Update
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pip-audit
+      - run: pip-audit

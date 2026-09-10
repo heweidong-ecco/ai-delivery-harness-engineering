@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  harness:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - CI=false
+      - PYTHON_VERSION=3.11
+    command: make gate
+
+  lint:
+    build: .
+    volumes:
+      - .:/app
+    command: make lint
+
+  test:
+    build: .
+    volumes:
+      - .:/app
+    command: make test

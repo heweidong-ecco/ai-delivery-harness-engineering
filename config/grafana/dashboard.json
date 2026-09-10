@@ -1,0 +1,9 @@
+{
+  "title": "Harness Dashboard",
+  "panels": [
+    { "title": "AI 代码率", "type": "graph" },
+    { "title": "返工轮次", "type": "graph" },
+    { "title": "门禁通过率", "type": "graph" },
+    { "title": "覆盖率", "type": "graph" }
+  ]
+}

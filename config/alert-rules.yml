@@ -1,0 +1,13 @@
+groups:
+  - name: harness
+    rules:
+      - alert: GateFailure
+        expr: gate_pass_rate < 0.9
+        for: 10m
+        labels:
+          severity: P1
+      - alert: CoverageLow
+        expr: coverage < 0.8
+        for: 5m
+        labels:
+          severity: P0

@@ -21,6 +21,8 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
       - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.41.0
@@ -42,6 +44,20 @@ repos:
         language: system
         pass_filenames: false
         args: ["."]
+
+      - id: check-complexity
+        name: check complexity
+        entry: python scripts/check_complexity.py
+        language: system
+        pass_filenames: false
+        args: ["src"]
+
+      - id: check-i18n
+        name: check i18n
+        entry: python scripts/check_i18n.py
+        language: system
+        pass_filenames: false
+        args: ["src"]
 
       - id: check-commit-msg
         name: check commit message

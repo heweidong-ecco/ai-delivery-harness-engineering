@@ -42,6 +42,12 @@ jobs:
       - name: Check layers
         run: python scripts/check_layers.py src
 
+      - name: Check complexity
+        run: python scripts/check_complexity.py src
+
+      - name: Check i18n
+        run: python scripts/check_i18n.py src
+
       - name: Check secrets
         run: python scripts/check_secrets.py .
 
@@ -53,6 +59,9 @@ jobs:
 
       - name: Bandit
         run: bandit -r src -q
+
+      - name: pip-audit
+        run: pip-audit --strict || true
 
   commit-message:
     runs-on: ubuntu-latest

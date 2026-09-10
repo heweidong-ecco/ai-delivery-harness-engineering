@@ -1,4 +1,4 @@
-.PHONY: install lint format type test layers secrets schema markdownlint yamllint gate commit-msg hooks clean
+.PHONY: install lint format type test layers secrets schema complexity i18n deps metrics audit markdownlint yamllint gate commit-msg hooks clean
 
 install:
 	pip install -e ".[dev]"
@@ -24,13 +24,29 @@ secrets:
 schema:
 	python scripts/validate_schemas.py
 
+complexity:
+	python scripts/check_complexity.py src
+
+i18n:
+	python scripts/check_i18n.py src
+
+deps:
+	python scripts/check_dependencies.py
+
+metrics:
+	python scripts/collect_metrics.py
+
+audit:
+	@echo "Usage: make audit EVENT='...' DETAIL='...'"
+	@[ -n "$(EVENT)" ] && python scripts/audit_log.py "$(EVENT)" "$(DETAIL)" || true
+
 markdownlint:
 	markdownlint "**/*.md" --ignore node_modules || true
 
 yamllint:
 	yamllint . || true
 
-gate: lint format type test layers secrets schema
+gate: lint format type test layers secrets schema complexity i18n
 	python scripts/check_pytest_report.py pytest-report.json
 	python scripts/check_python_rules.py src
 	python scripts/check_harness_docs.py
