@@ -1,0 +1,25 @@
+
+* text=auto eol=lf
+
+*.py text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.sh text eol=lf
+Makefile text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+
+*.py linguist-language=Python
+*.md linguist-documentation
+harness/** linguist-documentation
+docs/** linguist-documentation

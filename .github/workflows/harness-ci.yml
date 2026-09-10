@@ -39,5 +39,33 @@ jobs:
       - name: Check Python harness rules
         run: python scripts/check_python_rules.py src
 
+      - name: Check layers
+        run: python scripts/check_layers.py src
+
+      - name: Check secrets
+        run: python scripts/check_secrets.py .
+
       - name: Check Harness docs
         run: python scripts/check_harness_docs.py
+
+      - name: Validate schemas
+        run: python scripts/validate_schemas.py
+
+      - name: Bandit
+        run: bandit -r src -q
+
+  commit-message:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check commit messages
+        run: |
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          for sha in $(git rev-list "$base..$head"); do
+            git log -1 --format=%s "$sha" > /tmp/msg.txt
+            python scripts/check_commit_msg.py /tmp/msg.txt
+          done

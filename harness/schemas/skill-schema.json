@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Harness Skill",
+  "type": "object",
+  "required": ["name", "goal", "trigger", "input", "output", "gate"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "goal": { "type": "string", "minLength": 1 },
+    "trigger": { "type": "string", "minLength": 1 },
+    "input": { "type": "array" },
+    "steps": { "type": "array" },
+    "output": { "type": "array" },
+    "gate": { "type": "array" },
+    "fallback": { "type": "array" }
+  }
+}

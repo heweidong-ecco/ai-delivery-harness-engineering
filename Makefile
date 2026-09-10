@@ -1,4 +1,4 @@
-.PHONY: install lint format type test gate layers commit-msg hooks clean
+.PHONY: install lint format type test layers secrets schema markdownlint yamllint gate commit-msg hooks clean
 
 install:
 	pip install -e ".[dev]"
@@ -18,7 +18,19 @@ test:
 layers:
 	python scripts/check_layers.py src
 
-gate: lint format type test layers
+secrets:
+	python scripts/check_secrets.py .
+
+schema:
+	python scripts/validate_schemas.py
+
+markdownlint:
+	markdownlint "**/*.md" --ignore node_modules || true
+
+yamllint:
+	yamllint . || true
+
+gate: lint format type test layers secrets schema
 	python scripts/check_pytest_report.py pytest-report.json
 	python scripts/check_python_rules.py src
 	python scripts/check_harness_docs.py

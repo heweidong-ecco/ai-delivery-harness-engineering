@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 安全问题
+    url: mailto:security@example.com
+    about: 请勿公开报告安全漏洞
+  - name: 讨论
+    url: https://github.com/<org>/<repo>/discussions
+    about: 一般讨论请走 Discussions

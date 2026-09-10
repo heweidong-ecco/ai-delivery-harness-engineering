@@ -1,0 +1,13 @@
+# <type>: <subject>
+# |<---- 最多 72 字符 ---->|
+
+# type: feat | fix | docs | ci | chore | rule | agent | test
+# 示例：
+# rule: add PAY-001 from INC-2024-0421
+# docs: update fill guide
+# ci: add secret scan
+
+# 正文：说明为什么，而不是做了什么
+# 关联：Source / Req / Incident
+
+# --- COMMIT END ---
