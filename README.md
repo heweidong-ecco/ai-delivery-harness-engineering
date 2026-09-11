@@ -98,6 +98,7 @@ make gate                     # 期望：EXIT=0，137 个测试通过
 | 2 | `Markdownlint` / `Yamllint` 两步经 `pre-commit run` 执行 | 会在 CI 运行时拉取钩子环境（含 node），属**新增的 CI 网络依赖** |
 | 3 | `.pre-commit-config.yaml` 的 `rev` 与 `pyproject.toml` 的 `>=` 靠**人守同代** | 已对齐（ruff 0.16.7 / mypy 2.3.1），但**没有机器检查**这条一致性；隔久了会漂移 |
 | 4 | **五个人工确认点只有 HC-5 被机器校验** | HC-1 ~ HC-4 是纯文字约定，`human-checkpoints.md` 写着"阻塞"却**没有机制拦它** |
+| 5 | **`pip-audit` 审计的是整个环境，包含 runner 自带的包** | 它的结论**依赖宿主**：CI 的 Python 3.11 自带 `setuptools 79.0.1`（PYSEC-2026-3447），而本地 venv 不装 setuptools → 出现"本地过、CI 红"。**新 CVE 出现时这道门禁可能自己变红**，与本仓代码无关 |
 
 ### 封存后仍可复用的资产
 

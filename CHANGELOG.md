@@ -85,6 +85,12 @@
 
 ### Fixed
 
+- **CI 的 `pip-audit` 步在 main 上红**（run #36,提交 `c62e83b`）:
+  runner 自带的 `setuptools 79.0.1` 命中 PYSEC-2026-3447（修复于 83.0.0）——
+  `pip install` 只升级了 `pip`、没升级 `setuptools`。
+  → CI 的 Install 步改为 `--upgrade pip setuptools`（升级是正解,不是掩盖）。
+  顺带记录这道门禁的**宿主依赖**特性:`pip-audit` 审计整个环境,
+  故新 CVE 出现时它可能自己变红（见 README「已知限制」第 5 条）。
 - `scripts/check_harness_docs.py:1` 是 markdown 围栏 → SyntaxError → **该脚本永不执行**,而它被 `make gate` 与 CI 调用(H1,P0)
 - `tests/test_scripts.py` 用 `pytest.skip` 给坏门禁兜底(「门禁坏了就跳过它」)—— 已删,改为断言"它真的会拦"(H3,P0)
 - `tests/conftest.py` 的 `pytest_report_*` fixture 名为 `pytest_*`,被 pytest 当 hook 注册 → `PluginValidationError`,**测试套件连收集都跑不起来**(X3)

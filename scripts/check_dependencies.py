@@ -12,6 +12,13 @@
 所以正确写法是去掉 `--strict`、改用 `--skip-editable`:
   · 有漏洞   → 仍然 fail(硬语义不变,这才是 H11 要的);
   · 本仓自身是 editable 本地包 → 按 `--skip-editable` 跳过,不再误判为失败。
+
+⚠ 另一个已知特性(2026-09-11 实测,CI run #36):**pip-audit 审计的是整个环境,
+包含 base interpreter 自带的包**。所以它的结论**依赖宿主** ——
+CI 的 Python 3.11 runner 自带 `setuptools 79.0.1`(PYSEC-2026-3447),
+本地 venv(Python 3.14)**根本不装 setuptools**,于是出现"本地过、CI 红"。
+处置:CI 的 Install 步已一并 `--upgrade setuptools`(升级是正解,不是掩盖);
+但要注意 —— **新 CVE 出现时这道门禁可能自己变红**,这与本仓代码无关。
 """
 
 import subprocess

@@ -18,7 +18,11 @@ jobs:
 
       - name: Install
         run: |
-          python -m pip install --upgrade pip
+          # 一并升级 setuptools:runner 自带的旧版会被末尾的硬门禁 pip-audit 拦下
+          # （实测 PYSEC-2026-3447:setuptools 79.0.1 → 修复于 83.0.0）。
+          # 注意:pip-audit 审计的是**整个环境**,包含 runner 自带的包 ——
+          # 所以这道门禁的结论依赖宿主,新 CVE 出现时它可能"自己变红"。
+          python -m pip install --upgrade pip setuptools
           pip install -e ".[dev]"
 
       - name: Ruff lint
