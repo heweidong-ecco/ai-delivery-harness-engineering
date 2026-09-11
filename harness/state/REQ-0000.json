@@ -1,0 +1,130 @@
+{
+  "req": "REQ-0000",
+  "stages": [
+    {
+      "name": "需求分析",
+      "evidence": [
+        "harness/changes/{req}/requirement-analysis.md"
+      ]
+    },
+    {
+      "name": "需求评审",
+      "evidence": [
+        "harness/changes/{req}/review-record-v1.md"
+      ]
+    },
+    {
+      "name": "计划评审",
+      "evidence": [
+        "harness/changes/{req}/task-breakdown.md"
+      ]
+    },
+    {
+      "name": "编码实现",
+      "evidence": [
+        "harness/changes/{req}/coding-report.md"
+      ]
+    },
+    {
+      "name": "编码评审",
+      "evidence": [
+        "harness/changes/{req}/coding-report.md"
+      ]
+    },
+    {
+      "name": "单测编写",
+      "evidence": [
+        "harness/changes/{req}/unit-test-report.md"
+      ]
+    },
+    {
+      "name": "单测评审",
+      "evidence": [
+        "harness/changes/{req}/unit-test-report.md"
+      ]
+    },
+    {
+      "name": "CI 验证",
+      "evidence": [
+        "harness/changes/{req}/ci-result.md"
+      ]
+    },
+    {
+      "name": "部署验证",
+      "evidence": [
+        "harness/changes/{req}/deploy-validation.md"
+      ]
+    },
+    {
+      "name": "用户确认",
+      "evidence": [
+        "harness/checkpoints/{req}-HC5.md"
+      ]
+    }
+  ],
+  "current": "用户确认",
+  "history": [
+    {
+      "stage": "需求分析",
+      "status": "passed",
+      "at": "2026-09-11T13:58:14Z",
+      "passed_at": "2026-09-11T13:58:14Z"
+    },
+    {
+      "stage": "需求评审",
+      "status": "passed",
+      "at": "2026-09-11T13:58:15Z",
+      "passed_at": "2026-09-11T13:58:15Z"
+    },
+    {
+      "stage": "计划评审",
+      "status": "passed",
+      "at": "2026-09-11T13:58:15Z",
+      "passed_at": "2026-09-11T13:58:15Z"
+    },
+    {
+      "stage": "编码实现",
+      "status": "passed",
+      "at": "2026-09-11T13:58:15Z",
+      "passed_at": "2026-09-11T13:58:15Z"
+    },
+    {
+      "stage": "编码评审",
+      "status": "passed",
+      "at": "2026-09-11T13:58:15Z",
+      "passed_at": "2026-09-11T13:58:15Z"
+    },
+    {
+      "stage": "单测编写",
+      "status": "passed",
+      "at": "2026-09-11T13:58:15Z",
+      "passed_at": "2026-09-11T13:58:15Z"
+    },
+    {
+      "stage": "单测评审",
+      "status": "passed",
+      "at": "2026-09-11T13:58:15Z",
+      "passed_at": "2026-09-11T13:58:15Z"
+    },
+    {
+      "stage": "CI 验证",
+      "status": "passed",
+      "at": "2026-09-11T13:58:16Z",
+      "passed_at": "2026-09-11T13:58:16Z"
+    },
+    {
+      "stage": "部署验证",
+      "status": "passed",
+      "at": "2026-09-11T13:58:16Z",
+      "passed_at": "2026-09-11T13:58:16Z"
+    },
+    {
+      "stage": "用户确认",
+      "status": "passed",
+      "at": "2026-09-11T13:58:16Z",
+      "passed_at": "2026-09-11T13:58:26Z"
+    }
+  ],
+  "created_at": "2026-09-11T13:57:55Z",
+  "updated_at": "2026-09-11T14:03:56Z"
+}
