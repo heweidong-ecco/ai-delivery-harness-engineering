@@ -80,8 +80,59 @@
 - 但**填充 0%、试点 0%、十阶段从未被真实需求走过** —— 方法论有效性**未被验证**；
 - **封存 ≠ 废弃**：`scripts/` 下 5 个门禁脚本可脱离本骨架直接用于任何 Python 项目。
 
-> **完整的现状、"哪些结论可以信 / 哪些还不能信"、可复用资产与复活条件，
-> 见 [`docs/project-status.md`](./docs/project-status.md)。**
+**你可以立刻自己验证，不必信本文件的任何声明**：
+
+```bash
+bash scripts/dev-setup.sh     # 一键装好环境（建 venv、装依赖、装钩子）
+make gate                     # 期望：EXIT=0，137 个测试通过
+```
+
+> 本仓的核心主张是"**一切不可被机器验证的约束都是无效约束**"——
+> 那么对它自己的介绍也应该可被机器验证。跑一遍即可。
+
+### 已知限制（门面不遮丑）
+
+| # | 限制 | 影响 |
+| - | ---- | ---- |
+| 1 | CI 的 `commit-message` 作业带 `if: github.event_name == 'pull_request'` | 本仓"直接推 main、不走 PR"时**永不运行**；提交信息纪律只靠本地 `check-commit-msg` 钩子 |
+| 2 | `Markdownlint` / `Yamllint` 两步经 `pre-commit run` 执行 | 会在 CI 运行时拉取钩子环境（含 node），属**新增的 CI 网络依赖** |
+| 3 | `.pre-commit-config.yaml` 的 `rev` 与 `pyproject.toml` 的 `>=` 靠**人守同代** | 已对齐（ruff 0.16.7 / mypy 2.3.1），但**没有机器检查**这条一致性；隔久了会漂移 |
+| 4 | **五个人工确认点只有 HC-5 被机器校验** | HC-1 ~ HC-4 是纯文字约定，`human-checkpoints.md` 写着"阻塞"却**没有机制拦它** |
+
+### 封存后仍可复用的资产
+
+`scripts/` 下这几个脚本**不依赖本骨架的其余部分**，可直接搬进任何 Python 项目：
+
+| 脚本 | 作用 |
+| ---- | ---- |
+| `check_pytest_report.py` | 堵"测试全绿"的三种假象：一条没跑 / 有 skip 冒充通过 / 报告缺失 |
+| `check_python_rules.py` | 8 条可程序化硬规则（金额 float、HTTP timeout、裸 except、print、eval、密钥、时区…） |
+| `check_secrets.py` | 密钥扫描（支持 `pragma: allowlist secret` 行级豁免） |
+| `check_harness_docs.py` | 文档结构与代码围栏校验 |
+| `stage_gate.py` | 阶段状态机：前置阶段 passed **且产出物现在依然存在**才放行；断点续跑 |
+
+另有**作为流程文档**可单独采用的部分：十阶段流水线、五个人工确认点、**三道防编造闸**
+（来源强制 / 可执行强制 / 测试强制）。
+
+### 该读哪份文档
+
+| 文档 | 给谁看 | 什么时候看 |
+| ---- | ------ | ---------- |
+| **`README.md`**（本文件） | 所有人 | 第一眼：它是什么、不是什么、做到哪了 |
+| [`docs/project-status.md`](./docs/project-status.md) | 想判断"能不能信"的人 | **决定要不要用它之前**——含实测证据与"还不能信什么" |
+| [`BluePrint.md`](./BluePrint.md) | 设计者、架构组 | 想知道**为什么这样设计**（L0–L7 分层、门禁回退矩阵、指标） |
+| [`USAGE.md`](./USAGE.md) | 使用者、复制者 | 真要**动手用**时：三种使用方式、复制后改什么 |
+| [`FillWorkflow.md`](./FillWorkflow.md) | 填充者、Agent 操作者 | 真要**填充内容**时：来源池、14 个 Agent 的 Prompt、审核清单 |
+| [`docs/quickstart.md`](./docs/quickstart.md) | 上手者 | 想最快跑起来 |
+| [`harness/pipeline/stages.md`](./harness/pipeline/stages.md) | 执行者 | 十阶段的**权威定义** |
+| [`harness/iteration/patch-log.md`](./harness/iteration/patch-log.md) | 想知道"可信吗"的人 | **修订轨迹**：29 条缺陷（外审 H1–H14 + 自发现 X1–X25）逐条证据 |
+| [`docs/freeze.md`](./docs/freeze.md) | 维护者 | 冻结/解冻/封存记录与工作方式变更 |
+
+> **本仓的可信度来自哪里**：它经受过一次**外部审计**
+> （[`.claude/AUDIT-外审记录与修正建议.md`](./.claude/AUDIT-外审记录与修正建议.md)，工单头部已标 `[已修]`），
+> 把审计出的 **14 条**（H1–H14）与随后自发现的 **25 条**（X1–X25）**逐条修完、逐条留证**，
+> 并做了**反向验证**（把门禁改坏 → 测试必须变红）。
+> 全部记录在 `patch-log.md` —— 这比"我们做得很认真"这类声明可信得多。
 
 ---
 
@@ -1508,21 +1559,28 @@ MIT，见 [LICENSE](./LICENSE)。
 
 ## 附录：快速导航
 
-| 我想...        | 去看                                 |
-| -------------- | ------------------------------------ |
-| 快速上手       | `docs/quickstart.md`                 |
-| 填充 Harness   | `docs/fill-guide.md`                 |
-| 理解架构       | `docs/architecture.md`               |
-| 看十阶段       | `harness/pipeline/stages.md`         |
-| 看 Agent 定义  | `harness/agents/application-owner.md` |
-| 写第一条规则   | `harness/rules/_template.md`         |
-| 写第一个 Skill | `harness/skills/_template/SKILL.md`  |
-| 跑 Agent 填充  | `harness/agents/README.md`           |
-| 看反模式       | `docs/anti-patterns.md`              |
-| 看最佳实践     | `docs/best-practices.md`             |
-| 看术语         | `docs/glossary.md`                   |
-| 提 Issue       | `.github/ISSUE_TEMPLATE/`            |
-| 提 PR          | `.github/PULL_REQUEST_TEMPLATE.md`   |
+| 我想...              | 去看                                      |
+| -------------------- | ----------------------------------------- |
+| **判断能不能用它**   | `docs/project-status.md`（现状与验收）    |
+| **看设计总纲/蓝图**  | `BluePrint.md`                            |
+| **学怎么用这个 kit** | `USAGE.md`                                |
+| **学怎么填充内容**   | `FillWorkflow.md`                         |
+| **看修订轨迹**       | `harness/iteration/patch-log.md`          |
+| 看外审工单（已修）   | `.claude/AUDIT-外审记录与修正建议.md`     |
+| 看冻结 / 封存记录    | `docs/freeze.md`                          |
+| 快速上手             | `docs/quickstart.md`                      |
+| 填充 Harness         | `docs/fill-guide.md`                      |
+| 理解架构             | `docs/architecture.md`                    |
+| 看十阶段             | `harness/pipeline/stages.md`              |
+| 看 Agent 定义        | `harness/agents/application-owner.md`     |
+| 写第一条规则         | `harness/rules/_template.md`              |
+| 写第一个 Skill       | `harness/skills/_template/SKILL.md`       |
+| 跑 Agent 填充        | `harness/agents/README.md`                |
+| 看反模式             | `docs/anti-patterns.md`                   |
+| 看最佳实践           | `docs/best-practices.md`                  |
+| 看术语               | `docs/glossary.md`                        |
+| 提 Issue             | `.github/ISSUE_TEMPLATE/`                 |
+| 提 PR                | `.github/PULL_REQUEST_TEMPLATE.md`        |
 
 ---
 
