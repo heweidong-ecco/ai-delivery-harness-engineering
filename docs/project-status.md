@@ -164,6 +164,36 @@
 
 **复活条件**:见 §八。
 
+### 仓库元数据（description / topics）
+
+GitHub 的仓库描述与 topics **不存在文件里**（不像 README 那样可版本控制），
+只能通过网页或 API 设置。为免丢失，把**应当填写的值**记在这里，便于日后重建或核对：
+
+**Description**（Settings → General → Description）：
+
+```text
+AI 代码交付 Harness 体系（骨架 · 已封存）。给存量项目加一层外部约束与反馈：规则 + 技能 + 十阶段流水线 + 5 个人工确认点 + 可程序化质量门禁 + 三道防编造闸。核心门禁脚本可独立复用。
+```
+
+**Topics**（About → Topics）：
+
+```text
+ai-agents, ai-code-generation, harness-engineering, quality-gates, code-quality,
+ci-cd, llm, agentic-workflow, software-engineering, engineering-excellence,
+developer-tools, python, pre-commit, static-analysis, prompt-engineering,
+methodology, framework, archived
+```
+
+**需要一并开启的两个仓库开关**（本仓文件已依赖它们）：
+
+| 开关 | 位置 | 为什么必须开 |
+| ---- | ---- | ------------ |
+| **Private vulnerability reporting** | Settings → Code security | `SECURITY.md` 与 `.github/ISSUE_TEMPLATE/config.yml` 已把漏洞报告入口指向它；不开则该链接 404 |
+| **Discussions** | Settings → General → Features | `.github/ISSUE_TEMPLATE/config.yml` 的讨论链接指向它；不开则 404 |
+
+**Homepage**：可留空。若想填，指向本文件更有意义
+（它是唯一回答"能不能信"的文档），但 GitHub 的 Homepage 惯例是站外地址，故非必需。
+
 ## 十一、变更记录
 
 - 2026-09-11 建立。依据:外审修正三轮(H1–H14、X1–X18、X19–X25)后的实测数据。
