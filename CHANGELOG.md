@@ -24,6 +24,15 @@
 > `make gates|state|deps`)。`make gate` 一路通过,但**另一条链路(pre-commit)
 > 从未跑通过**,一跑就暴露 6 条真缺陷(X19–X24,见 patch-log §四 4.2)。
 
+- **本仓封存(停止演进)**:2026-09-11 封存为「方法论的参照范本」(`USAGE.md` 方式 A)。
+  原因是缺少可填充的真实来源(本仓为**存量项目**设计),缺原料继续写规则只会产出编造内容。
+  记录见 `docs/freeze.md` 封存记录与 `docs/project-status.md` §十
+- 修复机制空跑暴露的 4 条缺陷(见 `harness/pilot/findings.md` §一):
+  · 空跑-1 补 `harness/checkpoints/_template.md`,并在变更产出物清单里注明阶段 10 的产出物不在此目录
+  · 空跑-2 **去根因** —— 模板说明并入 `harness/changes/README.md`、删除 `_template/README.md`,
+    使 `_template/` 只剩交付物,文档里那句 `cp _template/*.md` 不改也自动正确
+  · 空跑-3 如实标注「五个人工确认点只有 HC-5 有机制,HC-1~4 是纯文字」(不编机制)
+  · 空跑-4 `stage_gate._save()` 与 `collect_metrics.py` 写出时补行尾换行
 - `docs/project-status.md` —— **项目现状与验收记录**:定位澄清(不是代码脚手架)、适用前提
   (为**存量项目**设计,新项目无原料可填)、实测验收证据、**可以信什么 / 还不能信什么**、
   可复用资产、启用(复活)条件、遗留待决事项

@@ -21,3 +21,8 @@
 - Agent 不得代替人工确认。
 - 确认人不得是编码 Agent。
 - 确认记录必须留痕。
+
+> ⚠ **如实标注(空跑-3)**:上面第一条「未确认不得进入下一阶段」目前**只有 HC-5 有机制**。
+> `harness/state/stages.json` 只把 `harness/checkpoints/<REQ>-HC5.md` 列为阶段 10 的产出物;
+> **HC-1 ~ HC-4 完全是文字约定,没有任何门禁拦它们** —— 与本仓修过的 H4/H5 同类:
+> 写下来的约束没有机制。属已知缺口,尚未处理(见 `harness/pilot/findings.md`)。

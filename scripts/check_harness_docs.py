@@ -51,7 +51,7 @@ ANCHORS = [
     # harness 的契约与规则入口(schema 是「软约束转硬」的钩子)
     "harness/schemas/rule-schema.json",
     "harness/schemas/skill-schema.json",
-    "harness/changes/_template/README.md",
+    "harness/changes/README.md",
     "harness/rules/_template.md",
     # 本门禁自身 + 状态机(最容易被改坏的三个脚本)
     "scripts/check_harness_docs.py",
@@ -104,7 +104,7 @@ H1_SEARCH_LINES = 10
 PLACEHOLDER_SKIP = {
     "harness/rules/_template.md",
     "harness/skills/_template/SKILL.md",
-    "harness/changes/_template/README.md",
+    "harness/checkpoints/_template.md",
 }
 
 

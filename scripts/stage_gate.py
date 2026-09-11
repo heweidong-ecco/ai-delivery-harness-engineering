@@ -69,7 +69,13 @@ def _load(req: str) -> dict:
 def _save(req: str, state: dict) -> None:
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     state["updated_at"] = _now()
-    _state_path(req).write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    # 末尾**必须**带换行:状态文件按设计是要入库的,而本仓 pre-commit 的
+    # `end-of-file-fixer` 要求文件以换行结尾 —— 少了它,每次含状态变更的提交
+    # 都会被钩子改文件并中止(实测:提交空跑产物时第一次 commit 失败)。
+    # 空跑-4,见 harness/pilot/findings.md。
+    _state_path(req).write_text(
+        json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def _stage_cfg(state: dict, name: str) -> dict | None:

@@ -32,8 +32,19 @@
 | **空跑-3** | **五个人工确认点里,只有 HC-5 被机器校验**。`human-checkpoints.md` 声称 HC-1 ~ HC-5 且"**未确认不得进入下一阶段(阻塞)**",但 `stages.json` 只把 `checkpoints/<REQ>-HC5.md` 列为阶段 10 的产出物 —— HC-1(需求评审后)、HC-2(计划评审后)、HC-3(编码评审后)、HC-4(部署前)**完全没有门禁** | `stages.json` 中带 `checkpoints` 产出物的阶段只有「用户确认」一个 | **与 H4/H5 同型**:写下来的约束没有机制。"五个人工确认点必须人工"目前是**纯文字**,4/5 无人守 |
 | **空跑-4** | **状态机写的 state 文件没有行尾换行 → 每个含状态变更的提交都要提交两次**。`stage_gate.py:_save()` 用 `write_text(json.dumps(state, ensure_ascii=False, indent=2))`,不带末尾换行;而本仓 pre-commit 的 `end-of-file-fixer` 要求文件以换行结尾 → 每次提交它都会改这个文件并**中止提交** | 提交本次空跑产物时实测:第一次 `git commit` **失败**,钩子输出 `Fixing harness/state/REQ-0000.json`;最小复现:调用 `_save()` 后文件末尾字符为 `'}'` | 状态文件按设计是**要入库**的(`docs/state` 的说明即如此),所以这是**每次状态变更都要付出**的摩擦。`collect_metrics.py:29` 有同样写法,但其输出目录被 gitignore,故未被钩子看到(属潜在同类问题) |
 
-> 三条都不是"设计错了",而是**设计与机制之间的缝隙** —— 正是本仓反复强调要消除的东西。
-> 处理与否、怎么处理,留待决策(**尚未修改**)。
+> 四条都不是"设计错了",而是**设计与机制之间的缝隙** —— 正是本仓反复强调要消除的东西。
+
+### 1.3 处理结果(2026-09-11 当天修复)
+
+| 编号 | 修法 |
+| ---- | ---- |
+| 空跑-1 | 新增 `harness/checkpoints/_template.md`;并在 `harness/changes/README.md` 的产出物清单里**显式注明阶段 10 的产出物不在这七件套里**;`checkpoints/README.md` 补「模板」一节与复制命令 |
+| 空跑-2 | **去根因**(而不是在 7 处文档贴补丁):把模板说明并入 `harness/changes/README.md`,删除 `_template/README.md` —— 于是 `_template/` 里**只剩交付物**,文档里那句 `cp _template/*.md` **一个字都不用改就自动正确** |
+| 空跑-3 | 按"如实标注、不编机制"处理:`human-checkpoints.md` 与 `checkpoints/README.md` 都明确写出**只有 HC-5 有机制,HC-1 ~ HC-4 是纯文字**,并注明"要上机制需先定清各自的证据" |
+| 空跑-4 | `stage_gate.py:_save()` 与 `collect_metrics.py` 写出时补 `"\n"`(后者输出目录被 gitignore,属同类潜在问题一并修) |
+
+> 验证:`harness/changes/_template/` 的 `*.md` 计数 = 7(只剩交付物);
+> 门禁与测试全绿(见提交信息)。
 
 ## 二、对照示例(**非本仓实测**)
 

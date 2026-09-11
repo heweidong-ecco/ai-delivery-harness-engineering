@@ -2,10 +2,10 @@
 > **使用指南**：见 [USAGE.md](./USAGE.md)
 > **填充工作流**：见 [FillWorkflow.md](./FillWorkflow.md)
 > **项目现状与验收记录**：见 [docs/project-status.md](./docs/project-status.md)
-> **状态**：v0.1.0-skeleton，**2026-09-11 解冻后暂不重新冻结**（见 `docs/freeze.md`）。
-> 外审缺陷 H1–H14 与三轮修正（自发现 X1–X25）均已完成：`make gate` 全绿、pre-commit 16/16 幂等。
-> 骨架 100% 完成；**填充 0%、试点 0%、十阶段从未被真实需求走过**（详见 `docs/project-status.md`）。
-> 下一步：引入**存量**项目 → 跑 6 个核心 Agent → 空跑 REQ-0000。
+> **状态**：**已封存（停止演进）** —— 2026-09-11 封存为「方法论的参照范本」（`USAGE.md` 方式 A）。
+> 封存前：外审 H1–H14 + 三轮自发现修正 X1–X25 + 机制空跑 REQ-0000 均已完成，`make gate` 全绿。
+> 骨架 100% 完成，但**填充 0%、试点 0%、十阶段从未被真实需求走过** —— 方法论**未被验证**。
+> 封存原因、可复用资产（`scripts/` 门禁脚本）与复活条件见 `docs/project-status.md`。
 >
 # AI Delivery Harness Engineering
 
@@ -14,7 +14,7 @@
 [![CI](https://github.com/<org>/<repo>/actions/workflows/harness-ci.yml/badge.svg)](https://github.com/<org>/<repo>/actions/workflows/harness-ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
-![Status](https://img.shields.io/badge/status-skeleton--unfrozen-orange)
+![Status](https://img.shields.io/badge/status-archived-lightgrey)
 
 ---
 
@@ -441,9 +441,8 @@ ai-delivery-harness-engineering/
 │   │   └── runbook.md                     # Runbook
 │   │
 │   ├── changes/                           # 变更管理
-│   │   ├── README.md                      # 变更索引
-│   │   └── _template/
-│   │       ├── README.md                  # 模板说明
+│   │   ├── README.md                      # 变更索引 + 模板说明 + 产出物清单
+│   │   └── _template/                     # 只有交付物本身(故 cp *.md 即七件套)
 │   │       ├── requirement-analysis.md    # 需求分析
 │   │       ├── task-breakdown.md          # 任务拆分
 │   │       ├── coding-report.md           # 编码报告
@@ -515,8 +514,9 @@ ai-delivery-harness-engineering/
 │   ├── audit/                             # 审计
 │   │   └── README.md
 │   │
-│   ├── checkpoints/                       # 确认点
-│   │   └── README.md
+│   ├── checkpoints/                       # 确认点(HC-1~HC-5 记录)
+│   │   ├── README.md
+│   │   └── _template.md                   # HC 记录模板(阶段 10 产出物所需)
 │   │
 │   └── schemas/                           # Schema
 │       ├── rule-schema.json

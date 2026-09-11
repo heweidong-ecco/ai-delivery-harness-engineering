@@ -26,7 +26,9 @@ def main() -> None:
     }
 
     out_file = out_dir / f"metrics-{datetime.now(UTC):%Y%m%d}.json"
-    out_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    # 末尾带换行 —— 与 scripts/stage_gate.py 同因(空跑-4):输出应满足
+    # `end-of-file-fixer`。本目录被 gitignore,故钩子看不到,属同类潜在问题一并修掉。
+    out_file.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     print(f"Metrics written to {out_file}")
 
 
