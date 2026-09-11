@@ -129,6 +129,36 @@
 | **X17** | **`BluePrint.md` §2 目录蓝图与已交付骨架不一致**(蓝图 3 份规则/9 Skill/只有 `agent/`;实交 20 份/14 SKILL/`agents/`+多个目录),却无一句对齐说明 | `BluePrint.md` §2 | ✅ 已加"蓝图≠实现"对照说明(不重写蓝图) |
 | **X18** | **markdownlint / yamllint 配了却从未运行**(既不在 gate 也不在 CI)→ 首跑积压 **309 条**;另有 3 个文件是"正文 + （模板）副本"拼接(`project-structure.md`、`python-layers.md`、`coding/SKILL.md`,与 X8 同型)、`metrics.md` 表格被未转义的 `\|` 撑破、CHANGELOG/ freeze 版本日期为占位符、全仓 81 个文件缺行尾换行 | `Makefile`、`.github/workflows/`、上述文件 | ✅ 已修;并把两者**挂进 gate 与 CI** |
 
+### 4.2 第三轮:补验证时发现的缺陷(X19–X24)
+
+> 修完 X1–X18 后,专门做了一轮"**把声称能跑的东西真的跑一遍**"的补验证
+> (端到端 `pre-commit run --all-files` + 实测 `stage_gate.py` / `check-gates.sh` /
+> `make gates|state|deps`)。结论:`make gate` 一路是通过的,但**另一条链路
+> (pre-commit)从未跑通过**,一跑就暴露 6 条真缺陷 —— 与 H18 同一主题:
+> "两条门禁链路各自为政,从未对齐"。
+
+| 编号 | 问题 | 证据 | 状态 |
+| ---- | ---- | ---- | ---- |
+| **X19** | **ruff 版本不同代 → 两条门禁互相拆台**。`.pre-commit-config.yaml` 钉 `v0.6.9`,pip 装的是 `0.16.7`。前者仍认 ANN101(清理 X1 时把该 ignore 删了 → 变成未忽略而报错);**更严重的是格式化打架**:0.6.9 排的版,0.16.7 的 `ruff format --check` 不接受 —— 用钩子提交后 `make gate` 必红 | `pre-commit` 实测:ruff Failed / ruff-format Failed;改回后 `1 file would be reformatted` | ✅ 已修(rev → v0.16.7,并在文件头写明必须与 pyproject 同代) |
+| **X20** | **mypy 版本不同代 + 钩子参数错误**。钉 `v1.11.2`(在 `src/__init__.py` 上报路径映射失败),pip 装 `2.3.1`;且钩子默认把改动文件名附加到 `mypy src` 之后 → `Duplicate module named "src"` | 实测两代 mypy 报错不同 | ✅ 已修(rev → v2.3.1 + `pass_filenames: false`) |
+| **X21** | **5 个本地钩子依赖 PATH → 提交被拦**。本地钩子用 `language: system` + `entry: python ...`,而 macOS **没有系统 `python`**;在新终端(未 `source .venv/bin/activate`)里提交时,实测 5 个钩子全报 `Executable python not found` —— 含 `check-commit-msg`,**每一次提交都会被拦住**且报错莫名其妙 | `pre-commit` 实测输出 | ✅ 已修(本地钩子改 `language: python`,脚本均为标准库,已核验) |
+| **X22** | **新增的 pytest 钩子环境缺 `jsonschema`** → 4 个 schema 相关用例全挂(其中 `test_declared_dev_tools_are_importable` 正是为守住这条而写) | `pre-commit` 实测 4 条 FAILED | ✅ 已修(补进 `additional_dependencies`) |
+| **X23** | **`trailing-whitespace` 误删 markdown 硬换行**:`SECURITY.md:5` 行尾两个空格是硬换行,被钩子删掉 → 渲染时两行合并 | `git diff SECURITY.md` | ✅ 已修(加 `--markdown-linebreak-ext=md` 并还原文件) |
+| **X24** | **`pip-audit --strict` 永远不可能通过** —— 本仓被 `-e .` 装成本地包、不在 PyPI 上,`--strict` 报 `Dependency not found on PyPI`。即 **H11 改成硬语义后,`make deps` 与 CI 那一步永远红**(又一次"门禁装了却永远跑不过")。`--strict` 管的是依赖**收集**失败,不是漏洞;有漏洞时无论如何都返回非零 | `make deps` rc=2;`pip-audit --strict` 实测 ERROR | ✅ 已修(改 `--skip-editable`,硬语义不变) |
+| **X25** | **本地钩子缺 `stages:` → 每次提交跑两遍**。pre-commit 的钩子默认在**所有阶段**都跑,而一次提交会依次触发 `pre-commit` 与 `commit-msg` 两个阶段 —— 实测提交 `ff48730` 时四个本地钩子各跑两遍,**pytest 整套被跑了两遍**(提交耗时翻倍) | 提交输出中 `check secrets/complexity/i18n/pytest` 各出现 2 次 | ✅ 已修(加 `stages: [pre-commit]`) |
+
+**加固(非已确认失败)**:`check_secrets.py` 的 `SKIP_DIRS` 补上 `.mypy_cache` /
+`.ruff_cache` / `.import_linter_cache` / `htmlcov` —— 原先扫描会一路走进这些构建产物,
+慢且无意义,且一旦缓存把源码字面量存进去就会误报测试夹具里的假密钥(实测当前 0 命中)。
+
+**已知观察(未改,留待决策)**:
+
+1. CI 的 `commit-message` 作业带 `if: github.event_name == 'pull_request'` ——
+   在本仓当前"**直接推 main、不走 PR**"的工作方式下**永不运行**,
+   提交信息纪律目前只靠本地 `check-commit-msg` 钩子(需已装钩子)。
+2. 新挂进 CI 的 `Markdownlint` / `Yamllint` 两步通过 `pre-commit run` 执行,
+   会在 CI 运行时拉取钩子环境(含 node)—— 这是**新增的 CI 运行时网络依赖**。
+
 **建议处理顺序**(工单 §7):`H1→H3`(先把坏门禁救活,并保证**再坏会被发现**)→ `H2` → `H5→H4`(增量阶段门 + 真状态机)→ 其余 → `H8`。
 
 **修完一条请更新状态**;全部修完在 `.claude/AUDIT-外审记录与修正建议.md` 头部加 `[已修]`(SessionStart 提示会自动关闭)。

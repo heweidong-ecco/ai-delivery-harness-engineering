@@ -11,7 +11,23 @@ PATTERNS = [
     (re.compile(r"(?i)bearer\s+[a-z0-9\-._~+/]+=*"), "Bearer Token"),
 ]
 
-SKIP_DIRS = {".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache"}
+# 跳过的是**构建/工具产物**,不是源码。补验证时发现:原先只跳了 __pycache__ 与
+# .pytest_cache,于是扫描会一路走进 .mypy_cache / .ruff_cache / .import_linter_cache /
+# htmlcov —— 那些目录里存的是源码片段与缓存数据,既慢又没有意义,
+# 而且一旦某个缓存格式改了(把源码字面量也存进去),测试夹具里的假密钥就会被误报。
+# (这是一处**加固**,不是已确认的失败 —— 当前实测为 0 命中。)
+SKIP_DIRS = {
+    ".git",
+    ".venv",
+    "venv",
+    "node_modules",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".import_linter_cache",
+    "htmlcov",
+}
 SKIP_EXTS = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".gz"}
 SKIP_FILES = {".env.example", "check_secrets.py"}
 

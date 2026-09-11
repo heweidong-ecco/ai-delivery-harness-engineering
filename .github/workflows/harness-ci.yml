@@ -86,7 +86,12 @@ jobs:
       - name: pip-audit
         # 反外审 H11:原为 `pip-audit --strict || true`(CI 软),
         # 与 scripts/check_dependencies.py(硬 fail)语义矛盾 —— 统一为硬。
-        run: pip-audit --strict
+        #
+        # ⚠ 但**不能**用 `--strict`:本仓被 `-e .` 装成本地包、不在 PyPI 上,
+        #   `--strict` 会让这一步**永远红**(实测:`Dependency not found on PyPI`)。
+        #   `--strict` 管的是"依赖收集失败",不是"发现漏洞" —— 有漏洞时
+        #   无论如何都返回非零,所以换成 `--skip-editable` 后硬语义不变。
+        run: pip-audit --skip-editable
 
   commit-message:
     runs-on: ubuntu-latest

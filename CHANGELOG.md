@@ -14,8 +14,10 @@
 
 ### Added
 
-> **2026-09-11 第二轮清理**:第一轮修完 H1–H14 后复查全仓,又发现并修掉 8 条
-> 同类缺陷(X11–X18,见 `harness/iteration/patch-log.md` §四 4.1)。
+> **2026-09-11 第三轮补验证**:前两轮修完后,专门把"声称能跑的东西"真的跑了一遍
+> (端到端 `pre-commit run --all-files` + 实测 `stage_gate.py` / `check-gates.sh` /
+> `make gates|state|deps`)。`make gate` 一路通过,但**另一条链路(pre-commit)
+> 从未跑通过**,一跑就暴露 6 条真缺陷(X19–X24,见 patch-log §四 4.2)。
 
 - `harness/rules/logging-standard.md` —— 补上骨架承诺却未交付的那一份规则文件(骨架承诺 20 份、实交 19 份)
 - `scripts/stage_gate.py` —— **真状态机**:进入阶段前校验前置阶段 passed **且产出物现在依然存在**;`resume` 从第一个断点续跑
@@ -59,6 +61,16 @@
 - `tests/conftest.py` 的 `pytest_report_*` fixture 名为 `pytest_*`,被 pytest 当 hook 注册 → `PluginValidationError`,**测试套件连收集都跑不起来**(X3)
 - `check_secrets.py` 拦自己的测试夹具 → 加行级豁免(X4)
 - `python-coding-standard.md` 是**两份文档拼接**(正文 + 重复的"（模板）"副本) → 去重(X8)
+- **pre-commit 全套首次跑通**,并修掉 5 条因此暴露的缺陷(X19–X23):
+  `.pre-commit-config.yaml` 钉的 ruff/mypy 与 pip 装的不同代 → 两条门禁互相拆台
+  (格式互相改、ANN101 误报、mypy 重复模块);本地钩子 `language: system` 依赖 PATH,
+  在 macOS 上(无系统 `python`)会导致**每一次提交都被拦住** → 改 `language: python`;
+  pytest 钩子环境缺 `jsonschema`;`trailing-whitespace` 误删 markdown 硬换行
+- **`pip-audit --strict` 改为 `--skip-editable`**:本仓是 `-e .` 本地包、不在 PyPI,
+  `--strict` 让 `make deps` 与 CI 那一步**永远红**;换 `--skip-editable` 后
+  硬语义不变(有漏洞仍返回非零)(X24)
+- **本地钩子补 `stages: [pre-commit]`**:原先缺该项,而 pre-commit 默认在**所有阶段**
+  都跑 —— 一次提交会触发两个阶段,实测四个本地钩子各跑两遍,**pytest 整套被跑了两遍**(X25)
 - `.gitignore` 补上 `.coverage` / `__pycache__` / `*.egg-info` / `pytest-report.json` 等构建产物(原先 `git status` 里一直挂着)
 
 ### Removed

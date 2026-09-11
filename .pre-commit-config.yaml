@@ -1,15 +1,29 @@
+# ⚠ 维护须知:下面这些 `rev` 必须与 `pyproject.toml` 的 dev 依赖**保持同一代**。
+#
+# 为什么(2026-09-11 实测发现的真缺陷):
+#   `rev` 是**精确钉住**的,而 `pyproject.toml` 写的是 `ruff>=0.6.9` / `mypy>=1.11.2`
+#   —— pip 会装最新版。于是同一个仓库里跑着**两代工具**,给出**相反的结论**:
+#     · ruff 0.6.9(pre-commit)还认 ANN101,ruff 0.16.7(pip)已移除该规则;
+#     · 更糟的是**格式化打架**:0.6.9 排的版,0.16.7 的 `ruff format --check` 不接受
+#       → 用钩子提交后,`make gate` 必然变红。两个门禁互相拆台。
+#   把 rev 对齐到与 pip 同代即可消除。升级 dev 依赖时,**同步改这里的 rev**。
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
+    rev: v0.16.7 # 对齐 pyproject 的 ruff>=0.6.9(pip 实际装 0.16.x)
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+    rev: v2.3.1 # 对齐 pyproject 的 mypy>=1.11.2(pip 实际装 2.3.x)。
+      # 1.11.2 会在 src/__init__.py 上因路径映射失败而报错,2.3.1 正常。
     hooks:
       - id: mypy
+        # `pass_filenames: false` 是必需的:钩子默认会把**改动过的文件名**追加到命令后面,
+        # 于是变成 `mypy src src/__init__.py` → 实测报
+        # `Duplicate module named "src"`。关掉后与 `make gate` 的 `mypy src` 完全一致。
+        pass_filenames: false
         args: [src]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -20,6 +34,9 @@ repos:
       - id: check-toml
       - id: end-of-file-fixer
       - id: trailing-whitespace
+        # markdown 里「行尾两个空格」是**硬换行**,不是脏数据。
+        # 不加这个参数,钩子会把 SECURITY.md 那类硬换行删掉 → 渲染时两行合并。
+        args: [--markdown-linebreak-ext=md]
       - id: check-merge-conflict
       - id: check-added-large-files
         args: [--maxkb=500]
@@ -36,35 +53,65 @@ repos:
       - id: yamllint
         args: [-c, .yamllint.yml]
 
+  # ── 本地钩子 ────────────────────────────────────────────────────────────────
+  #
+  # 全部用 `language: python`(而不是 `system`):
+  #   `system` 的 entry 依赖 `python` / `pytest` **在 PATH 上**。而 macOS 系统
+  #   根本没有 `python`;用户在新终端里(未 `source .venv/bin/activate`)提交时,
+  #   实测 **5 个钩子全部报 `Executable python not found`** —— 包括
+  #   `check-commit-msg`,那意味着**每一次提交都被拦住**且报错莫名其妙。
+  #   `language: python` 用 pre-commit 自建环境,`python` 必然存在,与 shell 无关。
+  #
+  # 注:下面这四个脚本**只用标准库**(已核验),所以不需要 additional_dependencies。
+  #     将来若某个脚本引入第三方依赖,必须在此声明,否则钩子会 ImportError。
+  #
+  # ⚠ 这四个钩子都带 `stages: [pre-commit]`,**不可省略**:pre-commit 的钩子默认在
+  #   **所有阶段**都跑,而一次提交会依次触发 `pre-commit` 与 `commit-msg` 两个阶段 ——
+  #   实测(提交 ff48730)四个钩子各跑了两遍,**pytest 整套被跑了两遍**。
+  #   只有 `check-commit-msg` 该留在 commit-msg 阶段。
   - repo: local
     hooks:
       - id: check-secrets
         name: check secrets
         entry: python scripts/check_secrets.py
-        language: system
+        language: python
+        stages: [pre-commit]
         pass_filenames: false
         args: ["."]
 
       - id: check-complexity
         name: check complexity
         entry: python scripts/check_complexity.py
-        language: system
+        language: python
+        stages: [pre-commit]
         pass_filenames: false
         args: ["src"]
 
       - id: check-i18n
         name: check i18n
         entry: python scripts/check_i18n.py
-        language: system
+        language: python
+        stages: [pre-commit]
         pass_filenames: false
         args: ["src"]
 
       # 反外审 H13:「跑测试」这条最重要的纪律,原先在提交环节**完全没有门** ——
       # lint/format/type/密钥都拦了,唯独测试没有。这里补上。
+      # additional_dependencies 必须与 pyproject 的 dev 依赖同代(理由见文件头)。
       - id: pytest
         name: pytest
         entry: pytest
-        language: system
+        language: python
+        # ⚠ 这份清单必须覆盖**测试运行时真正用到的**依赖,否则测试会因为
+        #   "钩子环境里没装"而红 —— 实测漏了 jsonschema 时,4 个 schema 相关
+        #   用例全挂(其中 `test_declared_dev_tools_are_importable` 正是为了
+        #   守住这条而写的)。改动 pyproject 的 dev 依赖时,同步改这里。
+        additional_dependencies:
+          - "pytest>=8.3.0"
+          - "pytest-cov>=5.0.0"
+          - "pytest-json-report>=1.5.0"
+          - "jsonschema>=4.20"
+        stages: [pre-commit]
         pass_filenames: false
         always_run: true
         args: ["-q"]
@@ -72,5 +119,5 @@ repos:
       - id: check-commit-msg
         name: check commit message
         entry: python scripts/check_commit_msg.py
-        language: system
+        language: python
         stages: [commit-msg]
