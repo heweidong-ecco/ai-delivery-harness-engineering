@@ -3,7 +3,12 @@
 ## 报告漏洞
 
 请勿公开 Issue 报告安全漏洞。  
-发送邮件至 `<security@example.com>`。
+请走 **GitHub 私密漏洞报告**（Private vulnerability reporting）：
+
+<https://github.com/heweidong-ecco/ai-delivery-harness-engineering/security/advisories/new>
+
+> 仓库管理员需在 **Settings → Code security** 中开启 *Private vulnerability reporting*
+> 该入口才会生效。本仓**不使用公开邮箱**接收漏洞报告。
 
 ## 支持版本
 

@@ -5,8 +5,15 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/)。
 版本遵循 [Semantic Versioning](https://semver.org/)。
 
-## [Unreleased]
+## [0.2.0] - 2026-09-11
 
+> 本版是**封存版**：外审修正三轮（H1–H14、X1–X18、X19–X25）+ 一次机制空跑 + 4 条空跑缺陷修复。
+> 本仓自此**停止演进**，不再有 `Unreleased` 段。封存说明见 `docs/freeze.md` 与
+> `docs/project-status.md` §十。
+>
+> 对照 `0.1.0-skeleton`：那一版是**修正前**的骨架 —— 门禁体系当时**实质失效**
+> （未外审、`make gate` 与 CI 从未绿过）。
+>
 > **2026-09-11 外审修正**:外部项目 `agent-eval-gate` 出具缺陷工单
 > (`.claude/AUDIT-外审记录与修正建议.md`),其中 **P0 三条表明门禁体系实质失效** ——
 > 详见 `harness/iteration/patch-log.md` §四 / §五。

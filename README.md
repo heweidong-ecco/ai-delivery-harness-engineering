@@ -11,7 +11,7 @@
 
 > AI 代码上线 Harness 体系：用外部约束与反馈系统，让 AI 生成的代码真正可上线。
 
-[![CI](https://github.com/<org>/<repo>/actions/workflows/harness-ci.yml/badge.svg)](https://github.com/<org>/<repo>/actions/workflows/harness-ci.yml)
+[![CI](https://github.com/heweidong-ecco/ai-delivery-harness-engineering/actions/workflows/harness-ci.yml/badge.svg)](https://github.com/heweidong-ecco/ai-delivery-harness-engineering/actions/workflows/harness-ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
 ![Status](https://img.shields.io/badge/status-archived-lightgrey)
