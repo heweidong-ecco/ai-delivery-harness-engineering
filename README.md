@@ -1,10 +1,10 @@
+> [English](./README.en.md) | **中文**
 > **项目蓝图**：见 [BluePrint.md](./BluePrint.md)
 > **使用指南**：见 [USAGE.md](./USAGE.md)
 > **填充工作流**：见 [FillWorkflow.md](./FillWorkflow.md)
 > **项目现状与验收记录**：见 [docs/project-status.md](./docs/project-status.md)
 > **状态**：**已封存（停止演进）** —— 2026-09-11 封存为「方法论的参照范本」（`USAGE.md` 方式 A）。
-> 封存前：外审 H1–H14 + 三轮自发现修正 X1–X25 + 机制空跑 REQ-0000 均已完成，`make gate` 全绿。
-> 骨架 100% 完成，但**填充 0%、试点 0%、十阶段从未被真实需求走过** —— 方法论**未被验证**。
+> 封存前：外审 H1–H14 + 三轮自发现修正 X1–X25 + 机制空跑 REQ-0000 均已完成，`make gate` 全绿；骨架 100% 完成，但**填充 0%、试点 0%、十阶段从未被真实需求走过** —— 方法论**未被验证**。
 > 封存原因、可复用资产（`scripts/` 门禁脚本）与复活条件见 `docs/project-status.md`。
 >
 # AI Delivery Harness Engineering

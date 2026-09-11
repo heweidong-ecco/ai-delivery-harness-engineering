@@ -192,9 +192,15 @@
 | **X26** | **CI 的 `pip-audit` 步在 main 上红** —— 但**不是本仓代码的问题**:GitHub runner 的 Python 3.11 自带 `setuptools 79.0.1`,命中 **PYSEC-2026-3447**(修复于 83.0.0);而 CI 的 Install 步只 `--upgrade pip`,没升级 `setuptools` → 硬化后的 `pip-audit`(H11 的成果)如实报出并 `exit 1`。**本地之所以绿**:本地 venv 是 Python 3.14,**根本不装 setuptools** | CI run #36(提交 `c62e83b`)日志:`Found 2 known vulnerabilities in 1 package` | ✅ 已修(CI Install 步改 `--upgrade pip setuptools`)+ 记录该门禁的**宿主依赖**特性 |
 | **X26-b** | **这道门禁的结论依赖宿主**:`pip-audit` 审计的是**整个环境**,包含 base interpreter 自带的包。于是**新 CVE 出现时,门禁可能自己变红**,与本仓代码无关 | 同上 | ✅ 已如实记入 README「已知限制」第 5 条与 `check_dependencies.py` docstring |
 
-> **顺带一个方法上的教训(值得记)**:我曾据"CI 总时长仅 56 秒"推断失败发生在**前半段**,
-> 从而排除了靠后的 `pip-audit` —— **这个推断是错的**,失败恰恰发生在最后一步。
-> 时长只是弱证据;定位远程 CI 失败应当**先拿日志**,不要用间接信号下结论。
+> **顺带两条方法上的教训(值得记)**:
+>
+> 1. 我曾据"CI 总时长仅 56 秒"推断失败发生在**前半段**,从而排除了靠后的 `pip-audit` ——
+>    **这个推断是错的**,失败恰恰发生在最后一步。
+>    时长只是弱证据;定位远程 CI 失败应当**先拿日志**,不要用间接信号下结论。
+> 2. **`pre-commit run --all-files` 看不见未跟踪的新文件**(它按 `git ls-files` 取文件)。
+>    写 `README.en.md` 时,它明明有 2 行超过 120 字符,`pre-commit` 却报 `Passed` ——
+>    因为当时该文件还没 `git add`。**新增文件后必须先 `git add` 再跑门禁**,
+>    否则会拿到一个假阴性。这两条都属"用间接信号代替直接证据"的同一类错。
 
 ---
 
