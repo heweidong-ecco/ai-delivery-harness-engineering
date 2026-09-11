@@ -19,6 +19,9 @@
 > `make gates|state|deps`)。`make gate` 一路通过,但**另一条链路(pre-commit)
 > 从未跑通过**,一跑就暴露 6 条真缺陷(X19–X24,见 patch-log §四 4.2)。
 
+- `docs/project-status.md` —— **项目现状与验收记录**:定位澄清(不是代码脚手架)、适用前提
+  (为**存量项目**设计,新项目无原料可填)、实测验收证据、**可以信什么 / 还不能信什么**、
+  可复用资产、启用(复活)条件、遗留待决事项
 - `harness/rules/logging-standard.md` —— 补上骨架承诺却未交付的那一份规则文件(骨架承诺 20 份、实交 19 份)
 - `scripts/stage_gate.py` —— **真状态机**:进入阶段前校验前置阶段 passed **且产出物现在依然存在**;`resume` 从第一个断点续跑
 - `harness/state/stages.json` —— 十阶段门配置(阶段 → 产出物),是 `stage_gate.py` 与 `check-gates.sh` 的**单一来源**
@@ -45,6 +48,11 @@
   去掉两份文档尾部的元文本、README 冻结状态改为与 `docs/freeze.md` 一致
 - markdownlint 首次真正跑通(此前**从未运行过**),309 条问题已清零;`make gate` 与
   CI 自此**包含** `markdownlint` / `yamllint`(此前两个 target 存在却不在任何链路里)
+- `harness/iteration/patch-log.md` 补 §四 4.3「补验证结论」(把**跑过、通过**的链路也记录下来,
+  避免"修完就当好了")与「按轮次索引」(四轮 ↔ 提交 hash 对应);§五 的「本次提交」占位符
+  填成真实 hash
+- `docs/roadmap.md` 的文件计数**改为带口径**(写明 glob),修正「技能模板(20 个)」等看不清口径的数字
+  (脚本与测试数因本轮新增文件而实际变化)
 - `.vscode/` 改为**随仓库交付**(原先被 `.gitignore` 忽略,而 README/USAGE 都承诺交付它)
 - `stages.md` 删掉与上文重复且永远空着的「每阶段三要素」表;`changes/README.md` 与
   `state/README.md` 补上两套状态词表的粒度对照(需求级 / 阶段级)

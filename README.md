@@ -1,10 +1,11 @@
 > **项目蓝图**：见 [BluePrint.md](./BluePrint.md)
 > **使用指南**：见 [USAGE.md](./USAGE.md)
 > **填充工作流**：见 [FillWorkflow.md](./FillWorkflow.md)
+> **项目现状与验收记录**：见 [docs/project-status.md](./docs/project-status.md)
 > **状态**：v0.1.0-skeleton，**2026-09-11 解冻后暂不重新冻结**（见 `docs/freeze.md`）。
-> 外审缺陷 H1–H14 与两轮全仓清理（X1–X18）均已完成，`make gate` 全绿。
-> 骨架 100% 完成，填充 0%，试点 0%。
-> 下一步：引入项目 → 跑 6 个核心 Agent → 空跑 REQ-0000。
+> 外审缺陷 H1–H14 与三轮修正（自发现 X1–X25）均已完成：`make gate` 全绿、pre-commit 16/16 幂等。
+> 骨架 100% 完成；**填充 0%、试点 0%、十阶段从未被真实需求走过**（详见 `docs/project-status.md`）。
+> 下一步：引入**存量**项目 → 跑 6 个核心 Agent → 空跑 REQ-0000。
 >
 # AI Delivery Harness Engineering
 
@@ -339,6 +340,7 @@ ai-delivery-harness-engineering/
 │   ├── faq.md                             # FAQ
 │   ├── architecture.md                    # 骨架架构
 │   ├── freeze.md                          # 冻结 / 解冻记录
+│   ├── project-status.md                  # 项目现状与验收记录(可信号/不可信什么)
 │   ├── naming-conventions.md              # 命名约定
 │   ├── versioning.md                      # 版本策略
 │   ├── anti-patterns.md                   # 反模式
