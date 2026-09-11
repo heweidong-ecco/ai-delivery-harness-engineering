@@ -37,7 +37,7 @@ jobs:
         run: pip-review --local --auto
 
       - name: Create PR
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: chore/dependency-update
