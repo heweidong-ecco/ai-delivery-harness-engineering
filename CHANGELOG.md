@@ -5,6 +5,25 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/)。
 版本遵循 [Semantic Versioning](https://semver.org/)。
 
+## [0.2.1] - 2026-09-11
+
+### Fixed
+
+- **CI 的 `pip-audit` 步在 main 上红**（run #36,提交 `c62e83b`）:
+  runner 自带的 `setuptools 79.0.1` 命中 PYSEC-2026-3447（修复于 83.0.0）——
+  CI 的 Install 步只 `--upgrade pip`、没升级 `setuptools`,于是硬化后的 `pip-audit`
+  （H11 的成果）如实报出并 `exit 1`。**根因不在本仓代码**;
+  本地之所以绿,是因为本地 venv（Python 3.14）**根本不装 setuptools**。
+  → CI Install 步改为 `--upgrade pip setuptools`（升级是正解,不用 ignore 掩盖该 CVE）。
+- 如实记录这道门禁的**宿主依赖**特性:`pip-audit` 审计的是**整个环境**、包含 base
+  interpreter 自带的包,所以**新 CVE 出现时它可能自己变红**,与本仓代码无关
+  （README「已知限制」第 5 条 + `scripts/check_dependencies.py` docstring）。
+
+> 本版为 **patch**:只修 CI 与文档记录,不改动骨架行为。
+> 记在 `harness/iteration/patch-log.md` §四 4.4（X26 / X26-b）。
+
+---
+
 ## [0.2.0] - 2026-09-11
 
 > 本版是**封存版**：外审修正三轮（H1–H14、X1–X18、X19–X25）+ 一次机制空跑 + 4 条空跑缺陷修复。
@@ -85,12 +104,6 @@
 
 ### Fixed
 
-- **CI 的 `pip-audit` 步在 main 上红**（run #36,提交 `c62e83b`）:
-  runner 自带的 `setuptools 79.0.1` 命中 PYSEC-2026-3447（修复于 83.0.0）——
-  `pip install` 只升级了 `pip`、没升级 `setuptools`。
-  → CI 的 Install 步改为 `--upgrade pip setuptools`（升级是正解,不是掩盖）。
-  顺带记录这道门禁的**宿主依赖**特性:`pip-audit` 审计整个环境,
-  故新 CVE 出现时它可能自己变红（见 README「已知限制」第 5 条）。
 - `scripts/check_harness_docs.py:1` 是 markdown 围栏 → SyntaxError → **该脚本永不执行**,而它被 `make gate` 与 CI 调用(H1,P0)
 - `tests/test_scripts.py` 用 `pytest.skip` 给坏门禁兜底(「门禁坏了就跳过它」)—— 已删,改为断言"它真的会拦"(H3,P0)
 - `tests/conftest.py` 的 `pytest_report_*` fixture 名为 `pytest_*`,被 pytest 当 hook 注册 → `PluginValidationError`,**测试套件连收集都跑不起来**(X3)
